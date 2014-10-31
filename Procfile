@@ -1,0 +1,1 @@
+web: gunicorn SceneMaker.wsgi --log-file -
