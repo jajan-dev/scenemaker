@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
-	return HttpResponse("Index")
+	return render(request, 'editor/editor.html')
 
 def login(request):
 	return HttpResponse("Login")

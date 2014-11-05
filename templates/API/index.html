@@ -1,0 +1,57 @@
+<!DOCTYPE>
+<html>
+<head>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="/static/API/js/api.js"></script>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Static navbar -->
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">Jajan! SceneMaker</a>
+                </div>
+            </div><!--/.container-fluid -->
+        </nav>
+
+        <!-- Main component for a primary marketing message or call to action -->
+        <div class="jumbotron">
+            <h1>SceneMaker API</h1>
+            <p>This API let's us do CRUD Operations on Scenes, Backgrounds, and Props</p>
+        </div>
+
+        <ul class="nav nav-tabs" id="api-table" role="tablist">
+            <li role="presentation" class="active"><a href="#scene" id="scene-tab" role="tab" data-toggle="tab" aria-controls="scene" aria-expanded="true">Scene</a></li>
+            <li role="presentation"><a href="#background" id="background-tab" role="tab" data-toggle="tab" aria-controls="background" aria-expanded="true">Background</a></li>
+            <li role="presentation"><a href="#prop" id="prop-tab" role="tab" data-toggle="tab" aria-controls="prop" aria-expanded="true">Prop</a></li>
+        </ul>
+
+        <div id="api-tab-content" class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="scene" aria-labelledby="scene-tab">
+                <div class="tab-title"><h1>Scene<h1></div>
+                <form role="form ">
+                    <select class="selectpicker form-control">
+                        <option>New</option>
+                        <option>Search</option>
+                        <option>Edit</option>
+                        <option>Delete</option>
+                    </select>
+                </form>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="background" aria-labelledby="background-tab">
+                Background
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="prop" aria-labelledby="prop-tab">
+                Prop
+            </div>
+        </div>
+    </div>
+</body>
+</html>

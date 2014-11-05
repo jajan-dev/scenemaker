@@ -1,0 +1,49 @@
+.hidden {
+	display: none;
+}
+
+.main-content {
+	position: relative;
+	top: 50px;
+}
+
+.sidebar {
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
+	display: block;
+	padding: 20px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	background-color: #f5f5f5;
+	border-right: 1px solid #eee;
+}
+
+.scene-wrapper {
+	position: absolute;
+}
+
+.prop {
+	position : absolute;
+}
+
+.scene-background {
+	position: absolute;
+}
+
+#scene-background-image {
+	display : none;
+	width: 1920px;
+	height: 1090px;
+}
+
+.scene-props {
+	position : absolute;
+}
+
+.background-thumbnail {
+	width : 160px;
+	height : 90px;
+}
