@@ -4,8 +4,8 @@ from API import views
 
 urlpatterns = patterns('',
 	url(r'^$', views.api),
-	url(r'^scenes/(?P<scene_id>\d+)/resources', views.scene_resources, name='scene_resources'),
-	url(r'^scenes/(?P<scene_id>\d+)/placement', views.scene_placement, name='scene_placement'),
+	url(r'^scenes/resources/(?P<scene_id>\d+)', views.scene_resources, name='scene_resources'),
+	url(r'^scenes/placement/(?P<scene_id>\d+)', views.scene_placement, name='scene_placement'),
 	url(r'^scenes/(?P<scene_id>\d+)/background/set', views.add_scene_background, name='add_scene_background'),
 	url(r'^scenes/(?P<scene_id>\d+)/props/add', views.add_scene_prop, name='add_scene_prop'),
 	url(r'^scenes/(?P<scene_id>\d+)', views.scene, name='scene'),

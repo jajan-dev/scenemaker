@@ -1,132 +1,325 @@
 $(document).ready(function(){
 
+	// Current Scene loaded in the Client Browser
 	scene = {};
+	var scenes = [];
+	var backgrounds = [];
+	var props = [];
 
-	$("#new-background").on('change.bs.fileinput', function(){
-		// Background Attached
-		var files = [this.files[0]];
-		var file = files[0];
-
-		var backgroundFr = new FileReader();
-		backgroundFr.readAsDataURL(file);
-		$("#new-background").replaceWith($("#new-background").val('').clone(true));
-		$(".fileinput-filename").html("");
-		
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("background",value);
-		});
-		data.append("name", "testing the backgrond upload");
-		data.append("description", "");
-		
+	// Save New Background to Server
+	function newBackground(formData){
 		$.ajax({
 			type : "POST",
 			url : "/api/backgrounds/",
-			data : data,
+			data : formData,
 			processData : false,
 			contentType : false,
 			enctype : 'multiplart/form-data',
 			success : function(result){
-
-				var background = result.background;
-
-				var thumb = new Image();
-				thumb.src = background.url;
-				$(thumb).addClass("img-thumbnail").addClass("background-thumbnail");
-				var thumbRow = $("<div></div>").append(thumb);
-				$("#backgrounds").append(thumbRow);
-
-				$(".background-thumbnail").dblclick(function(event){
-					$.ajax({
-						type : "POST",
-						url : "/api/scenes/" + scene.id + "/background/set",
-						data : JSON.stringify({ background : background.id }),
-						success : function(result){
-							var background = result.background;
-							scene.background = background;
-							console.log(background);
-							$("#scene-background-image")[0].src = background.url;
-							$("#scene-background-image").css("display", "block");
-						},
-						error : function(error){
-							console.log("ERROR");
-						}
-					});
-				});
+				// Show that New Background Was Uploaded to Server
+				newBackgroundView(result.background)
 			},
 			error : function(error){
 				// BAD
-				console.log(error);
+				console.log(error.statusText);
 			}
 		});
-	});
-	
-	$("#new-prop").on('change.bs.fileinput', function(){
-		// Prop Attached
-		var files = [this.files[0]];
-		var file = files[0];
+	}
 
-		var propFr = new FileReader();
-		propFr.readAsDataURL(file);
-		$("#new-prop").replaceWith($("#new-prop").val('').clone(true));
-		$(".fileinput-filename").html("");
+	// Show that New Background Was Uploaded to Server
+	function newBackgroundView(background){
 
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("prop",value);
-		});
-		data.append("name", "testing the prop upload");
-		data.append("description", "");
+		// Create a Thumbnail
+		var thumb = new Image();
+		thumb.src = background.url || "/media/default/question-mark.jpg";
+		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail");
+
+		// Create a New Row in the Background Collection
+		var thumbRow = $("<div></div>").append(thumb);
 		
+		// Add Thumbnail to Backgrounds
+		$("#backgrounds").append(thumbRow);
+
+		// Event Listener for Background Thumbnail - Selection / Set
+		$(thumb).dblclick(function(event){
+			if (!scene.hasOwnProperty("id")){
+				// Scene Must be Set First
+				return false;
+			}
+			// Set Current Scene Background using Background Data Model Representation
+			setBackground(background);
+		});
+	}
+
+	// Set Current Scene Background using Background Dat Model Representation
+	function setBackground(background){
+		$.ajax({
+			type : "POST",
+			url : "/api/scenes/" + scene.id + "/background/set",
+			data : JSON.stringify({ background : background.id }),
+			success : function(result){
+				// Set Current Scene's Background in the DOM
+				setBackgroundView(result.background);
+				// Update Client Scene Thumbnail
+				changeSceneThumbnail(scene);
+			},
+			error : function(error){
+				// BAD
+				console.log(error.statusText);
+			}
+		});
+	}
+
+	// Set Current Scene's Background in the DOM
+	function setBackgroundView(background){
+		
+		// Update Client Model
+		scene.background = background;
+		
+		// Update Client View
+		$("#scene-background-image").attr("src", background.url || "");
+		$("#scene-background-image").css("display", "block");
+	}
+
+	// Save New Prop to Server
+	function newProp(formData){
 		$.ajax({
 			type : "POST",
 			url : "/api/props/",
-			data : data,
+			data : formData,
 			processData : false,
 			contentType : false,
 			enctype : 'multiplart/form-data',
 			success : function(result){
-				// GOOD
-				var prop = result.prop;
-
-				var thumb = new Image();
-				thumb.src = prop.url;
-				$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail");
-				var thumbRow = $("<div></div>").append(thumb);
-				$("#props").append(thumbRow);
-
-				$(".prop-thumbnail").dblclick(function(event){
-					$.ajax({
-						type : "POST",
-						url : "/api/scenes/" + scene.id + "/props/add",
-						data : JSON.stringify({ prop : prop.id }),
-						success : function(result){
-							var prop = result.prop;
-							scene.props[prop.scene_prop_id] = prop;
-							var image = new Image();
-							image.src = prop.url;
-							$(image).data("scene-prop-id", prop.scene_prop_id);
-							image.draggable = true;
-							$(image).addClass("prop");
-							$(".scene-props").append(image);
-						},
-						error : function(error){
-							console.log("ERROR");
-						}
-					});
-				});
+				newPropView(result.prop);
 			},
 			error : function(error){
 				// BAD
-				console.log("Failed to add prop")
+				console.log(error.statusText);
 			}
-		})
-	});
+		});
+	}
 
+	// Show that New Prop was Uploaded to Server
+	function newPropView(prop){
+
+		var thumb = new Image();
+		thumb.src = prop.url || "/media/default/question-mark.jpg";
+		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail");
+		var thumbRow = $("<div></div>").append(thumb);
+		$("#props").append(thumbRow);
+
+		$(thumb).dblclick(function(event){
+			if (!scene.hasOwnProperty("id")){
+				// Scene Must be Set First
+				return false;
+			}
+			addProp(prop);
+		});
+	}
+
+	// Add Prop to Current Scene on Server
+	function addProp(prop){
+		$.ajax({
+			type : "POST",
+			url : "/api/scenes/" + scene.id + "/props/add",
+			data : JSON.stringify({ prop : prop.id }),
+			success : function(result){
+				addPropView(result.prop)
+			},
+			error : function(error){
+				console.log(error.statusText);
+			}
+		});
+	}
+
+	// Add Prop to Current Scene in the DOM
+	function addPropView(prop){
+		scene.props[prop.scene_prop_id] = prop;
+		var image = new Image();
+		image.src = prop.url || "";
+		$(image).data("scene-prop-id", prop.scene_prop_id);
+		image.draggable = true;
+		$(image).addClass("prop");
+		$(".scene-props").append(image);
+		image.style.left = prop.position_x ? prop.position_x + "px" : "0px";
+		image.style.top = prop.position_y ? prop.position_y + "px" : "0px";
+	}
+
+	// Update Prop Position on Server
+	function moveProp(id, update){
+		$.ajax({
+			type : "PUT",
+			url : "/api/scenes/" + scene.id,
+			data : JSON.stringify(update),
+			success : function(result){
+				// Saved
+				scene.props[id].position_x = update.update.position_x;
+				scene.props[id].position_y = update.update.position_y;
+				changeSceneThumbnail(scene);
+			},
+			error : function(error){
+				console.log(error.statusText);
+			}
+		});
+	}
+
+	// Save New Scene on Server
+	function newScene(name, description){
+		$.ajax({
+			type : "POST",
+			url : "/api/scenes",
+			data : JSON.stringify({
+				name : name,
+				description : description
+			}),
+			success : function(result){
+				newSceneView(result.scene);
+			},
+			error : function(error){
+				console.log(error.statusText);
+			}
+		});
+	}
+
+	// Show that New Scene was Created on Server
+	function newSceneView(new_scene){
+
+		// Close Modal
+		$("#new-scene-prompter").addClass("disabled");
+		$("#new-scene-modal").modal("hide");
+		$("#new-scene-form .form-control").val("");
+
+		// Display Meta Info
+		var nameDiv = $("<div></div>").text("Name: " + new_scene.name);
+		var descDiv = $("<div></div>").text("Description: " + new_scene.description);
+		clearSceneView();
+
+		// Model
+		scene = {
+			id : new_scene.id,
+			name : new_scene.name,
+			description : new_scene.description,
+			version : new_scene.version,
+			background : {},
+			background_scale : 1.0,
+			props : {}
+		}
+
+		// View
+		clearSceneView();
+
+		addSceneThumbnail(new_scene);
+
+	}
+
+	function addSceneThumbnail(scene){
+
+		// Create Thumbnail
+		var thumb = createSceneThumbnailImage(scene);
+
+		// Create a New Row in the Background Collection
+		var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
+		$(thumbRow).data("scene-id", scene.id);
+		
+		// Add Thumbnail to Backgrounds
+		$("#scenes").append(thumbRow);
+
+		// Event Listener for Background Thumbnail - Selection / Set
+		$(thumb).dblclick(function(event){
+			// Set Current Scene using Scene Data Model Representation
+			changeScene(scene);
+		});
+	}
+
+	function changeSceneThumbnail(scene){
+
+		var newThumbnailData = createSceneThumbnailImage(scene).src;
+
+		// Change Thumbnail
+		var sceneThumbnail = $(".scene-thumbnail-row").filter(function(){
+			return $(this).data("scene-id") === scene.id;
+		}).find(".scene-thumbnail")[0];
+		sceneThumbnail.src = newThumbnailData;
+	}
+
+	function createSceneThumbnailImage(scene){
+		
+		// Create Temporary Canvas
+		var canvas = $("<canvas></canvas>")[0];
+		var ctx = canvas.getContext('2d');
+
+		// Create a Thumbnail
+		var thumb = new Image();
+		$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
+
+		// Draw Background
+		var backgroundImage = new Image();
+		backgroundImage.src = scene.background.url || "";
+		canvas.width = 1920 || backgroundImage.width;
+		canvas.height = 1080 || backgroundImage.height;
+		console.log(backgroundImage.width, backgroundImage.height);
+		ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height);
+
+		// Draw Props
+		for (var i in scene.props){
+			var prop = scene.props[i];
+			var propImage = new Image();
+			propImage.src = prop.url;
+			var left = prop["position_x"];
+			var top = prop["position_y"];
+
+			ctx.drawImage(propImage,left,top);
+		}
+
+		// Return Image
+		var imageDataURL = canvas.toDataURL();
+		thumb.src = imageDataURL;
+		return thumb;
+	}
+
+	// Change Scene Client Model
+	function changeScene(new_scene){
+		scene = new_scene;
+		changeSceneView();
+	}
+
+	// Change Scene Client View
+	function changeSceneView(){
+		background = scene.background;
+		props = scene.props;
+		clearSceneView();
+		setBackgroundView(background);
+		for (var i in props){
+			var prop = props[i];
+			addPropView(prop);
+		}
+		return true;
+	}
+
+	// Resets Scene to Empty View
+	function clearSceneView(){
+		$("#scene-background-image").attr("src", "");
+		$(".scene-props").html("");
+		return true;
+	}
+
+	// CLIENT EVENTS //
+
+	// Drag Event Listener
+	window.onload = function() {
+		document.onmousedown = startDrag;
+		document.onmouseup = stopDrag;
+	}
+
+	// Drag Event Listener Helpers
+
+	// Drag Event Variables
 	var drag = false;
 	var targ, coordX, coordY, offsetX, offsetY;
 	var left, top, maxLeft, maxTop;
 
+	// Start Drag Event Hanlder
 	function startDrag(e) {
 		// determine event object
 		if (!e) {
@@ -157,6 +350,7 @@ $(document).ready(function(){
 		return false;
 	}
 
+	// Draggig Event Handler
 	function dragDiv(e) {
 		if (!drag) { return; }
 		if (!e) { var e = window.event; }
@@ -183,6 +377,7 @@ $(document).ready(function(){
 		return false;
 	}
 
+	// Stop Drag Event Handler
 	function stopDrag(e) {
 		drag = false;
 
@@ -191,80 +386,130 @@ $(document).ready(function(){
 		var propLeft = parseInt(targ.style.left,10);
 		var propTop = parseInt(targ.style.top,10);
 		var scenePropId = $(targ).data("scene-prop-id");
-		var update_data = JSON.stringify({
+		var update_data = {
 			update : {
 				type : "PROP",
 				scene_prop : scenePropId,
 				position_x : propLeft,
 				position_y : propTop
 			}
-		});
-		$.ajax({
-			type : "PUT",
-			url : "/api/scenes/" + scene.id,
-			data : update_data,
-			success : function(result){
-				// Saved
-				scene.props[scenePropId].position_x = propLeft;
-				scene.props[scenePropId].position_y = propTop;
-			},
-			error : function(error){
-				console.log(error);
-			}
-		})
+		};
+		moveProp(scenePropId, update_data);
 	}
 
-	window.onload = function() {
-		document.onmousedown = startDrag;
-		document.onmouseup = stopDrag;
-	}
-
+	// New Scene Event Listener
 	$("#create-new-scene-btn").click(function(event){
+		
+		// Get Metadata
 		var name = $("#new-scene-name").val();
 		var description = $("#new-scene-description").val()
-		$.ajax({
-			type : "POST",
-			url : "/api/scenes",
-			data : JSON.stringify({
-				name : name,
-				description : description
-			}),
-			success : function(result){
-				console.log(result);
+		
+		// Create New Scene on Server
+		newScene(name, description);
+	});
 
-				// Close Modal
-				$(".scenemaker-fileinput .btn").removeClass("disabled");
-				$("#new-prop, #new-background").attr("disabled", false);
-				$("#new-scene-prompter").addClass("disabled");
-				$("#new-scene-modal").modal("hide");
-				$("#new-scene-form .form-control").val("");
+	// Background Image Uploaded Event Listener
+	$("#new-background").on('change.bs.fileinput', function(){
 
-				// Display Meta Info
-				$("#save-scene").removeClass("disabled");
-				var nameDiv = $("<div></div>").text("Name: " + name);
-				var descDiv = $("<div></div>").text("Description: " + description);
-				$("#scenes").append(nameDiv).append(descDiv);
+		// Get File
+		var files = [this.files[0]];
+		var file = files[0];
 
-				// Model
-				scene = {
-					id : result.scene.id,
-					name : result.scene.name,
-					description : result.scene.description,
-					version : result.scene.version,
-					background : {},
-					background_scale : 1.0,
-					props : {}
+		// Read File
+		var backgroundFr = new FileReader();
+		backgroundFr.readAsDataURL(file);
+
+		// Reset Upload Tool (Blank)
+		$("#new-background").replaceWith($("#new-background").val('').clone(true));
+		$(".fileinput-filename").html("");
+		
+		// Create New Form with Background Image
+		var data = new FormData();
+		$.each(files, function(key,value){
+			data.append("background",value);
+		});
+
+		// Background Image Metadata - TODO
+		data.append("name", "testing the backgrond upload");
+		data.append("description", "");
+		
+		// Save New Background to Server
+		newBackground(data);
+	});
+
+	// Prop Image Uploaded Event Listener
+	$("#new-prop").on('change.bs.fileinput', function(){
+		
+		// Get File
+		var files = [this.files[0]];
+		var file = files[0];
+
+		// Read File
+		var propFr = new FileReader();
+		propFr.readAsDataURL(file);
+
+		// Reset Upload Tool (Blank)
+		$("#new-prop").replaceWith($("#new-prop").val('').clone(true));
+		$(".fileinput-filename").html("");
+
+		// Create New Form with Prop Image
+		var data = new FormData();
+		$.each(files, function(key,value){
+			data.append("prop",value);
+		});
+
+		// Prop Image Metadata - TODO
+		data.append("name", "testing the prop upload");
+		data.append("description", "");
+
+		newProp(data);
+	});
+
+	// Initializtion
+
+	// Load All Scenes
+	$.ajax({
+		type: "GET",
+		url: "/api/scenes",
+		success: function(result){
+			scenes = result.scenes;
+			for (var i in scenes){
+				var load_scene = scenes[i];
+				var props_array = load_scene.props;
+				load_scene.props = {};
+				for (var j in props_array){
+					var prop = props_array[j];
+					load_scene.props[prop.scene_prop_id] = prop;
 				}
-
-				// Switch to Backgronds Tab now
-				$(".full-tab.active").removeClass("active");
-				$("#backgrounds-tab").parent().addClass("active");
-				$(".tab-pane#scenes").removeClass("active").removeClass("in");
-				$(".tab-pane#backgrounds").addClass("active").addClass("in");
-			},
-			error : function(error){
-				console.log(error);
+				scenes[load_scene.id] = load_scene;
+				addSceneThumbnail(load_scene);
 			}
-		})
+		}
+	});
+
+	// Load All Backgrounds
+	$.ajax({
+		type: "GET",
+		url: "/api/backgrounds",
+		success: function(result){
+			backgrounds = result.backgrounds;
+			for (var i in backgrounds){
+				var background = backgrounds[i];
+				newBackgroundView(background);
+			}
+		}
+	});
+
+	// Load All Props
+	$.ajax({
+		type: "GET",
+		url: "/api/props",
+		success: function(result){
+			props = result.props;
+			for (var i in props){
+				var prop = props[i];
+				newPropView(prop);
+			}
+		}
 	});
 });

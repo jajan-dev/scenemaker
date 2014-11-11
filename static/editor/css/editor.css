@@ -33,7 +33,7 @@
 	position: absolute;
 }
 
-#scene-background-image {
+#scene-background {
 	display : none;
 	width: 1920px;
 	height: 1090px;
@@ -43,7 +43,16 @@
 	position : absolute;
 }
 
+.scene-thumbnail {
+	width: 160px;
+	height: 90px;
+}
+
 .background-thumbnail {
 	width : 160px;
 	height : 90px;
+}
+
+.prop-thumbnail {
+	max-width: 100px;
 }

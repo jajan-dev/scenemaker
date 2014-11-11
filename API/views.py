@@ -19,17 +19,66 @@ def api(request):
 def scenes(request):
 	if request.method == "GET":
 		# GET ALL - later
-		return HttpResponse("Scenes Search : For Later...")
+		try:
+			domain = request.get_host()
+			scenes = Scene.objects.all()
+			response_data = { "scenes" : [], "success" : True }
+			for scene in scenes:
+				scene_rep = {
+					"id" : scene.id,
+					"name" : scene.name,
+					"version" : scene.version,
+					"description" : scene.description,
+					"background" : {},
+					"background_scale" : float(scene.background_scale),
+					"props" : []
+				}
+				if scene.background is not None:
+					background = Background.objects.get(id=scene.background.id)
+					scene_rep["background"] = {
+						"id" : background.id,
+						"name" : background.name,
+						"description" : background.description,
+						"url" : "http://" + domain + background.image.url
+					}
+				for scene_prop in SceneProp.objects.filter(scene=scene):
+					prop = scene_prop.prop_file
+					if prop is not None and scene_prop is not None:
+						prop_rep = {
+							"scene_prop_id" : scene_prop.id,
+							"prop_id" : prop.id,
+							"name" : prop.name,
+							"description" : prop.description,
+							"url" : "http://" + domain + prop.image.url,
+							"position_x" : scene_prop.position_x,
+							"position_y" : scene_prop.position_y,
+							"scale" : float(scene_prop.scale),
+							"index" : scene_prop.index,
+							"rotation" : float(scene_prop.rotation)
+						}
+						scene_rep["props"].append(prop_rep)
+				response_data["scenes"].append(scene_rep)
+			return HttpResponse(json.dumps(response_data), content_type="application/json")
+		except ObjectDoesNotExist:
+			return HttpResponse(status=404)
 	elif request.method == "POST":
 		# New Scene (Default Background Settings)
 		try:
 			data = json.loads(request.body)
 			new_scene = Scene(name=data['name'], description=data['description'], version="1.0.0", background_scale=1.0)
 			new_scene.save()
-			response_data = { "success" : True, "scene" : { "id" : new_scene.id, "name" : new_scene.name, "description" : new_scene.description, "version" : new_scene.version } }
+			response_data = {
+				"success" : True,
+				"scene" : {
+					"id" : new_scene.id,
+					"name" : new_scene.name,
+					"description" : new_scene.description,
+					"version" : new_scene.version
+				}
+			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except Exception:
-			return HttpResponse(status=500, message="Something went wrong while trying to create a new scene")
+			return HttpResponse(status=500)
 	else:
 		return HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -39,7 +88,12 @@ def scene(request, scene_id):
 		try:
 			scene = Scene.objects.get(id=scene_id)
 			response_data = {}
-			response_data["scene"] = {"id" : scene.id, "name" : scene.name, "description" : scene.description, "version" : scene.version}
+			response_data["scene"] = {
+				"id" : scene.id,
+				"name" : scene.name,
+				"description" : scene.description,
+				"version" : scene.version
+			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
 			print "Scene does not exist"
@@ -72,7 +126,10 @@ def scene(request, scene_id):
 			scene.save()
 		elif update["type"] == "PROP":
 			# SceneProp attributes
-			scene_prop = SceneProp.objects.get(id=update["scene_prop"])
+			try:
+				scene_prop = SceneProp.objects.get(id=update["scene_prop"])
+			except ObjectDoesNotExist:
+				return HttpResponse(status=404)
 			if update.has_key("scale"):
 				scene_prop.scale = update["scale"]
 			if update.has_key("position_x"):
@@ -83,7 +140,6 @@ def scene(request, scene_id):
 				scene_prop.index = update["index"]
 			if update.has_key("rotation"):
 				scene_prop.rotation = update["rotation"]
-			print update
 			scene_prop.save()
 		else:
 			return HttpResponse(status=400)
@@ -102,15 +158,29 @@ def scene_resources(request, scene_id):
 			domain = request.get_host()
 			scene = Scene.objects.get(id=scene_id)
 			response_data = {}
-			response_data["scene"] = { "name" : scene.name, "version" : scene.version, "props" : []}
+			response_data["scene"] = {
+				"name" : scene.name,
+				"version" : scene.version,
+				"props" : []
+			}
 			if scene.background is not None:
 				background = Background.objects.get(id=scene.background.id)
-				response_data["scene"]["background"] = { "id" : background.id, "name" : background.name, "description" : background.description, "url" : "http://" + domain + background.image.url }
+				response_data["scene"]["background"] = {
+					"id" : background.id,
+					"name" : background.name,
+					"description" : background.description,
+					"url" : "http://" + domain + background.image.url
+				}
 			scene_props = SceneProp.objects.filter(scene=scene)
 			for scene_prop in scene_props:
 				prop = scene_prop.prop_file
 				if prop is not None:
-					obj = { "id" : prop.id, "name" : prop.name, "description" : prop.description, "url" : "http://" + domain + prop.image.url}
+					obj = {
+						"id" : prop.id,
+						"name" : prop.name,
+						"description" : prop.description,
+						"url" : "http://" + domain + prop.image.url
+					}
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
@@ -126,15 +196,34 @@ def scene_placement(request, scene_id):
 			domain = request.get_host()
 			scene = Scene.objects.get(id=scene_id)
 			response_data = {}
-			response_data["scene"] = { "name" : scene.name, "version" : scene.version, "background" : "" , "props" : []}
+			response_data["scene"] = {
+				"name" : scene.name,
+				"version" : scene.version,
+				"background" : "" ,
+				"props" : []
+			}
 			if scene.background is not None:
 				background = Background.objects.get(id=scene.background.id)
-				response_data["scene"]["background"] = { "id" : background.id, "name" : background.name, "position-x" : 0, "position-y" : 0, "scale" : float(scene.background_scale)}
+				response_data["scene"]["background"] = {
+					"id" : background.id,
+					"name" : background.name,
+					"position-x" : 0,
+					"position-y" : 0,
+					"scale" : float(scene.background_scale)
+				}
 			scene_props = SceneProp.objects.filter(scene=scene)
 			for scene_prop in scene_props:
 				prop = scene_prop.prop_file
 				if prop is not None:
-					obj = { "id" : prop.id, "name" : prop.name, "position-x" : scene_prop.position_x, "position-y" : scene_prop.position_y, "scale" : float(scene_prop.scale), "index" : scene_prop.index, "rotation" : float(scene_prop.rotation) }
+					obj = {
+						"id" : prop.id,
+						"name" : prop.name,
+						"position-x" : scene_prop.position_x,
+						"position-y" : scene_prop.position_y,
+						"scale" : float(scene_prop.scale),
+						"index" : scene_prop.index,
+						"rotation" : float(scene_prop.rotation)
+					}
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
@@ -146,7 +235,9 @@ def scene_placement(request, scene_id):
 @csrf_exempt
 def add_scene_background(request, scene_id):
 	if request.method == "POST":
+		print request.body
 		data = json.loads(request.body)
+		print data
 		try:
 			scene = Scene.objects.get(id=scene_id)
 			try:
@@ -155,7 +246,7 @@ def add_scene_background(request, scene_id):
 				scene.background = background
 				scene.save()
 				response_data = { 
-					"success" : True, 
+					"success" : True,
 					"background" : { 
 						"id" : background_id, 
 						"name" :  background.name,
@@ -212,7 +303,12 @@ def backgrounds(request):
 		response_data = { "backgrounds" : [] }
 		backgrounds = Background.objects.all()
 		for background in backgrounds:
-			obj = { "id" : background.id, "name" : background.name, "description" : background.description, "url" : "http://" + domain + background.image.url }
+			obj = {
+				"id" : background.id,
+				"name" : background.name,
+				"description" : background.description,
+				"url" : "http://" + domain + background.image.url
+			}
 			response_data["backgrounds"].append(obj)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	elif request.method == "POST":
@@ -225,7 +321,10 @@ def backgrounds(request):
 			"description" : background_model.description, 
 			"url" : "http://" + domain + background_model.image.url 
 		}
-		response_data = { "background" : background_rep, "success" : True }
+		response_data = {
+			"background" : background_rep,
+			"success" : True
+		}
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		return HttpResponseNotAllowed(['GET', 'POST'])
@@ -238,10 +337,15 @@ def background(request, background_id):
 		try:
 			background = Background.objects.get(id=background_id)
 			response_data = {}
-			response_data["background"] = { "id" : background.id, "name" : background.name, "description" : background.description, "url" : "http://" + domain + background.image.url }
+			response_data["background"] = {
+				"id" : background.id,
+				"name" : background.name,
+				"description" : background.description,
+				"url" : "http://" + domain + background.image.url
+			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
-			print "Background does not exist"
+			return HttpResponse(status=404)
 	elif request.method == "PUT":
 		# PUT - UPDATE - later
 		pass
@@ -269,7 +373,12 @@ def props(request):
 		response_data = { "props" : [] }
 		props = Prop.objects.all()
 		for prop in props:
-			obj = { "id" : prop.id, "name" : prop.name, "description" : prop.description, "url" : "http://" + domain + prop.image.url }
+			obj = {
+				"id" : prop.id,
+				"name" : prop.name,
+				"description" : prop.description,
+				"url" : "http://" + domain + prop.image.url
+			}
 			response_data["props"].append(obj)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	elif request.method == "POST":
@@ -282,7 +391,10 @@ def props(request):
 			"description" : prop_model.description,
 			"url" : "http://" + domain + prop_model.image.url 
 		}
-		response_data = { "prop" : prop_rep, "success" : True }
+		response_data = {
+			"prop" : prop_rep,
+			"success" : True
+		}
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		return HttpResponseNotAllowed(['GET', 'POST'])
@@ -295,7 +407,12 @@ def prop(request, prop_id):
 		try:
 			prop = Prop.objects.get(id=prop_id)
 			response_data = {}
-			response_data["prop"] = { "id" : prop.id, "name" : prop.name, "description" : prop.description, "url" : "http://" + domain + prop.image.url }
+			response_data["prop"] = {
+				"id" : prop.id,
+				"name" : prop.name,
+				"description" : prop.description,
+				"url" : "http://" + domain + prop.image.url
+			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
 			print "Prop does not exist"
