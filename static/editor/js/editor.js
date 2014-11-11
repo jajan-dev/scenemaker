@@ -77,8 +77,10 @@ $(document).ready(function(){
 		scene.background = background;
 		
 		// Update Client View
-		$("#scene-background-image").attr("src", background.url || "");
-		$("#scene-background-image").css("display", "block");
+		$("#scene-background-image").attr("src", background.url || "")
+			.css("display", "block")
+			.attr("draggable", false);
+
 	}
 
 	// Save New Prop to Server
@@ -186,14 +188,8 @@ $(document).ready(function(){
 	function newSceneView(new_scene){
 
 		// Close Modal
-		$("#new-scene-prompter").addClass("disabled");
 		$("#new-scene-modal").modal("hide");
 		$("#new-scene-form .form-control").val("");
-
-		// Display Meta Info
-		var nameDiv = $("<div></div>").text("Name: " + new_scene.name);
-		var descDiv = $("<div></div>").text("Description: " + new_scene.description);
-		clearSceneView();
 
 		// Model
 		scene = {
@@ -209,6 +205,7 @@ $(document).ready(function(){
 		// View
 		clearSceneView();
 
+		// Thumbnail
 		addSceneThumbnail(new_scene);
 
 	}
@@ -258,7 +255,6 @@ $(document).ready(function(){
 		backgroundImage.src = scene.background.url || "";
 		canvas.width = 1920 || backgroundImage.width;
 		canvas.height = 1080 || backgroundImage.height;
-		console.log(backgroundImage.width, backgroundImage.height);
 		ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height);
 
 		// Draw Props

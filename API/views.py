@@ -73,7 +73,15 @@ def scenes(request):
 					"id" : new_scene.id,
 					"name" : new_scene.name,
 					"description" : new_scene.description,
-					"version" : new_scene.version
+					"version" : new_scene.version,
+					"background" : {
+						"id" : "",
+						"name" : "",
+						"description" : "",
+						"url" : ""
+					},
+					"background_scale" : new_scene.background_scale,
+					"props" : []
 				}
 			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
