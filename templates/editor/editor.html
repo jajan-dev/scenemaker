@@ -50,28 +50,21 @@
     </nav>
     <div class="container-fluid main-content">
         <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
+            <div class="col-sm-4 col-md-3 sidebar">
                 <div class="container-fluid">
                     <ul class="nav nav-tabs menu-tabs nav-justified" role="tablist">
                         <li role="presentation" class="active full-tab"><a href="#scenes" id="scenes-tab" role="tab" data-toggle="tab" aria-controls="scenes" aria-expanded="true">Scenes</a></li>
                         <li role="presentation" class="full-tab"><a href="#backgrounds" id="backgrounds-tab" role="tab" data-toggle="tab" aria-controls="backgrounds" aria-expanded="true">Backgrounds</a></li>
                         <li role="presentation" class="full-tab"><a href="#props" id="props-tab" role="tab" data-toggle="tab" aria-controls="props" aria-expanded="true">Props</a></li>
+                        <li role="presentation" class="full-tab"><a href="#editor" id="editor-tab" role="tab" data-toggle="tab" aria-controls="editor" aria-expanded="true">Editor</a></li>
                     </ul>
 
                     <div id="menu-tab-content" class="tab-content">
                         <div role="tabpanel" class="tab-pane fade active in text-center" id="scenes" aria-labelledby="scenes-tab">
                             <div class="tab-title"><h1>Scenes<h1></div>
-                            <!-- <form role="form">
-                                <select class="selectpicker form-control">
-                                    <option>New</option>
-                                    <option>Search</option>
-                                    <option>Edit</option>
-                                    <option>Delete</option>
-                                </select>
-                            </form> -->
                             <div>
-                            	<span type="button" id="new-scene-prompter" class="btn btn-primary" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
-                        	</div>
+                                <span type="button" id="new-scene-prompter" class="btn btn-primary" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
+                            </div>
                         </div>
                         <div role="tabpanel" class="tab-pane fade text-center" id="backgrounds" aria-labelledby="backgrounds-tab">
                             <div class="tab-title"><h1>Backgrounds<h1></div>
@@ -101,10 +94,31 @@
                                 <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
                             </div>
                         </div>
+                        <div role="tabpanel" class="tab-pane fade text-center" id="editor" aria-labelledby="editor-tab">
+                            <div class="tab-title">
+                                <h1>Editor</h1>
+                            </div>
+                            <div class="tab-section">
+                                <h2>Scene</h2>
+                                <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
+                                <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
+                                <div id="editor-scene-version">Version: <span id="editor-scene-version-value"></span></div>
+                            </div>
+                            <div class="tab-section">
+                                <h2>Background</h2>
+                                <div id="editor-background">
+                                    <img class="img-thumbnail background-thumbnail">
+                                </div>
+                            </div>
+                            <div class="tab-section">
+                                <h2>Props</h2>
+                                <div id="editor-props"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-9 colmd-offset-3 col-md-10 col-md-offset-2 scene-wrapper">
+            <div class="col-sm-8 colmd-offset-4 col-md-9 col-md-offset-3 scene-wrapper">
                 <div class="scene-background scene">
                     <img id="scene-background-image">
                 </div>
@@ -130,32 +144,32 @@
 
     <!-- Modals -->
     <div class="modal fade" id="new-scene-modal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">
-						<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
-					</button>
-					<h4 class="modal-title">New Scene</h4>
-				</div>
-				<div class="modal-body">
-					<form id="new-scene-form" role="form">
-						<div class="form-group">
-							<label for="new-scene-name">Name: </label>
-							<input class="form-control" id="new-scene-name">
-						</div>
-						<div class="form-group">
-							<label for="new-scene-description">Description: </label>
-							<input class="form-control" id="new-scene-description">
-						</div>
-					</form>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" id="create-new-scene-btn">Create</button>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">New Scene</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="new-scene-form" role="form">
+                        <div class="form-group">
+                            <label for="new-scene-name">Name: </label>
+                            <input class="form-control" id="new-scene-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-scene-description">Description: </label>
+                            <input class="form-control" id="new-scene-description">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="create-new-scene-btn">Create</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </body>
 </html>

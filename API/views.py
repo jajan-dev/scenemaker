@@ -104,8 +104,7 @@ def scene(request, scene_id):
 			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
-			print "Scene does not exist"
-			return HttpResponse("Scene does not exist")
+			return HttpResponse(status=404)
 	elif request.method == "PUT":
 		# Update Scene
 		scene = Scene.objects.get(id=scene_id)
@@ -192,7 +191,7 @@ def scene_resources(request, scene_id):
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
-			print "Scene does not exist"
+			return HttpResponse(status=404)
 	else:
 		return HttpResponseNotAllowed('GET')
 	return HttpResponse(scene_id)
@@ -235,7 +234,7 @@ def scene_placement(request, scene_id):
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
-			print "Scene does not exist"
+			return HttpResponse(status=404)
 	else:
 		return HttpResponseNotAllowed('GET')
 	return HttpResponse(scene_id)
@@ -243,9 +242,7 @@ def scene_placement(request, scene_id):
 @csrf_exempt
 def add_scene_background(request, scene_id):
 	if request.method == "POST":
-		print request.body
 		data = json.loads(request.body)
-		print data
 		try:
 			scene = Scene.objects.get(id=scene_id)
 			try:
@@ -264,9 +261,9 @@ def add_scene_background(request, scene_id):
 				}
 				return HttpResponse(json.dumps(response_data), content_type="application/json")
 			except ObjectDoesNotExist:
-				print "Background does not exist"
+				return HttpResponse(status=404)
 		except ObjectDoesNotExist:
-			print "Scene does not exist"
+			return HttpResponse(status=404)
 	else:
 		return HttpResponseNotAllowed('POST')
 
@@ -297,9 +294,9 @@ def add_scene_prop(request, scene_id):
 				}
 				return HttpResponse(json.dumps(response_data), content_type="application/json")
 			except ObjectDoesNotExist:
-				print "Prop does not exist"
+				return HttpResponse(status=404)
 		except ObjectDoesNotExist:
-			print "Scene does not exist"
+			return HttpResponse(status=404)
 	else:
 		return HttpResponseNotAllowed('POST')
 
@@ -423,7 +420,7 @@ def prop(request, prop_id):
 			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
-			print "Prop does not exist"
+			return HttpResponse(status=404)
 	elif request.method == "PUT":
 		# PUT - UPDATE - later
 		pass

@@ -58,8 +58,14 @@ $(document).ready(function(){
 			url : "/api/scenes/" + scene.id + "/background/set",
 			data : JSON.stringify({ background : background.id }),
 			success : function(result){
+				
+				// Set Client Model Scene's Background
+				var background = result.background;
+				scene.background = background;
+
 				// Set Current Scene's Background in the DOM
-				setBackgroundView(result.background);
+				setBackgroundView(background);
+
 				// Update Client Scene Thumbnail
 				changeSceneThumbnail(scene);
 			},
@@ -72,15 +78,10 @@ $(document).ready(function(){
 
 	// Set Current Scene's Background in the DOM
 	function setBackgroundView(background){
-		
-		// Update Client Model
-		scene.background = background;
-		
-		// Update Client View
 		$("#scene-background-image").attr("src", background.url || "")
 			.css("display", "block")
 			.attr("draggable", false);
-
+		changeEditorMenu();
 	}
 
 	// Save New Prop to Server
@@ -159,6 +160,7 @@ $(document).ready(function(){
 				scene.props[id].position_x = update.update.position_x;
 				scene.props[id].position_y = update.update.position_y;
 				changeSceneThumbnail(scene);
+				changeEditorMenu();
 			},
 			error : function(error){
 				console.log(error.statusText);
@@ -280,7 +282,7 @@ $(document).ready(function(){
 		changeSceneView();
 	}
 
-	// Change Scene Client View
+	// Change Scene in the DOM
 	function changeSceneView(){
 		background = scene.background;
 		props = scene.props;
@@ -290,6 +292,9 @@ $(document).ready(function(){
 			var prop = props[i];
 			addPropView(prop);
 		}
+
+		// Update Editor
+		changeEditorMenu();
 		return true;
 	}
 
@@ -298,6 +303,30 @@ $(document).ready(function(){
 		$("#scene-background-image").attr("src", "");
 		$(".scene-props").html("");
 		return true;
+	}
+
+	// Update Editor Menu With Current Scene
+	function changeEditorMenu(){
+
+		// Change Metadata
+		$("#editor-scene-name-value").text(scene.name);
+		$("#editor-scene-description-value").text(scene.description);
+		$("#editor-scene-version-value").text(scene.version);
+		
+		// Change Background
+		$("#editor-background .background-thumbnail").attr("src", scene.background.url || "");
+		
+		// Change Props
+		$("#editor-props").html("");
+		$.each(scene.props, function(i,prop){
+			if (!prop.url){
+				return false;
+			}
+			var propImage = new Image();
+			propImage.src = prop.url;
+			$(propImage).addClass("img-thumbnail").addClass("prop-thumbnail");
+			$("#editor-props").append(propImage);
+		});
 	}
 
 	// CLIENT EVENTS //

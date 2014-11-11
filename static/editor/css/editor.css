@@ -43,14 +43,13 @@
 	position : absolute;
 }
 
-.scene-thumbnail {
-	width: 160px;
-	height: 90px;
+.img-thumbnail {
+	margin: 10px;
 }
 
-.background-thumbnail {
-	width : 160px;
-	height : 90px;
+.scene-thumbnail, .background-thumbnail {
+	width : 240px;
+	height : 135px;
 }
 
 .prop-thumbnail {
