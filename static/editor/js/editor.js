@@ -129,6 +129,7 @@ $(document).ready(function(){
 			data : JSON.stringify({ prop : prop.id }),
 			success : function(result){
 				addPropView(result.prop)
+				changeEditorMenu();
 			},
 			error : function(error){
 				console.log(error.statusText);
@@ -209,6 +210,9 @@ $(document).ready(function(){
 
 		// Thumbnail
 		addSceneThumbnail(new_scene);
+
+		// Update Editor Menu
+		changeEditorMenu();
 
 	}
 
