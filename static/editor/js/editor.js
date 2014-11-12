@@ -75,11 +75,11 @@ $(document).ready(function(){
 
 	// Set Current Scene's Background in the DOM
 	function renderBackgroundView(background){
-		$("#scene-background-image").attr("src", background.url || "")
+		$("#scene-background-image").attr("src", background.url || "/static/editor/img/undefined.png")
 			.css("display", "block")
 			.attr("draggable", false);
 		var tempBackground = new Image();
-		tempBackground.src = background.url || "";
+		tempBackground.src = background.url || "/static/editor/img/undefined.png";
 		var width = tempBackground.width;
 		var height = tempBackground.height;
 		$("#scene-background-image")[0].width = scene.background_scale * width;
@@ -144,7 +144,7 @@ $(document).ready(function(){
 	// Add Prop to Current Scene in the DOM
 	function renderPropView(prop){
 		var image = new Image();
-		image.src = prop.url || "";
+		image.src = prop.url || "/static/editor/img/undefined.png";
 		$(image).data("scene-prop-id", prop.scene_prop_id);
 		image.draggable = true;
 		$(image).addClass("prop");
@@ -236,7 +236,7 @@ $(document).ready(function(){
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
 			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
 			$(thumb).data("scene-id", scene.id);
-			console.log(scene, thumb, thumbRow);
+			
 			// Add Thumbnail to Backgrounds
 			$("#scenes").append(thumbRow);
 
@@ -252,7 +252,7 @@ $(document).ready(function(){
 
 		createSceneThumbnailImage(scene, function(thumb){
 			// Change Thumbnail
-			$(".scene-thumbnail").filter(function(){
+			var sceneThumbnail = $(".scene-thumbnail").filter(function(){
 				return $(this).data("scene-id") === scene.id;
 			}).attr("src", thumb.src);
 		});
@@ -277,7 +277,7 @@ $(document).ready(function(){
 			ctx.drawImage(this, 0, 0, backgroundImage.width, backgroundImage.height);
 			multiplePropThumbnailLoader(scene.props, propsLoaded);
 		}
-		backgroundImage.src = scene.background.url || "";
+		backgroundImage.src = scene.background.url || "/static/editor/img/undefined.png";
 
 		function propsLoaded(propImages){
 			for (var i in propImages){
@@ -340,7 +340,7 @@ $(document).ready(function(){
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
-			.attr("src", scene.background.url || "")
+			.attr("src", scene.background.url || "/static/editor/img/undefined.png")
 			.removeClass("disabled")
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
@@ -419,7 +419,7 @@ $(document).ready(function(){
 
 			// Get Original Dimensions
 			var tempBackground = new Image();
-			tempBackground.src = scene.background.url || "";
+			tempBackground.src = scene.background.url || "/static/editor/img/undefined.png";
 			var width = tempBackground.width;
 			var height = tempBackground.height;
 
@@ -719,7 +719,7 @@ $(document).ready(function(){
 					callback(propImages);
 				}
 			}
-			img.src = prop.url;
+			img.src = props[i].url;
 		});
 	}
 
