@@ -9,7 +9,7 @@ class Scene(models.Model):
 	version = models.CharField(max_length=16, default="1.0.0")
 	
 	## Background
-	background = models.ForeignKey('Background', related_name='scene', related_query_name='scene', blank=True, null=True)
+	background = models.ForeignKey('Background', related_name='scenes', related_query_name='scenes', blank=True, null=True)
 	background_scale = models.DecimalField(decimal_places=2, max_digits=8, default=1.0)
 
 	## Props
@@ -37,7 +37,7 @@ class Background(models.Model):
 	description = models.CharField(max_length=500, blank=True)
 
 	## Image Data
-	image = models.ImageField(upload_to='backgrounds')
+	image = models.ImageField(upload_to='backgrounds/')
 
 
 class Prop(models.Model):
@@ -47,4 +47,4 @@ class Prop(models.Model):
 	description = models.CharField(max_length=500, blank=True)
 
 	## Image Data
-	image = models.ImageField(upload_to='props')
+	image = models.ImageField(upload_to='props/')

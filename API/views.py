@@ -3,7 +3,9 @@ from django.http import *
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
 from django.conf import settings
-import json, os
+from django.core.files.storage import default_storage as storage
+from boto.s3.connection import S3Connection, Bucket, Key
+import json, os, time
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -39,7 +41,7 @@ def scenes(request):
 						"id" : background.id,
 						"name" : background.name,
 						"description" : background.description,
-						"url" : "http://" + domain + background.image.url
+						"url" : background.image.url
 					}
 				for scene_prop in SceneProp.objects.filter(scene=scene):
 					prop = scene_prop.prop_file
@@ -49,7 +51,7 @@ def scenes(request):
 							"prop_id" : prop.id,
 							"name" : prop.name,
 							"description" : prop.description,
-							"url" : "http://" + domain + prop.image.url,
+							"url" : prop.image.url,
 							"position_x" : scene_prop.position_x,
 							"position_y" : scene_prop.position_y,
 							"scale" : float(scene_prop.scale),
@@ -111,7 +113,7 @@ def scene(request, scene_id):
 					"id" : background.id,
 					"name" : background.name,
 					"description" : background.description,
-					"url" : "http://" + domain + background.image.url
+					"url" : background.image.url
 				}
 			for scene_prop in SceneProp.objects.filter(scene=scene):
 				prop = scene_prop.prop_file
@@ -121,7 +123,7 @@ def scene(request, scene_id):
 						"prop_id" : prop.id,
 						"name" : prop.name,
 						"description" : prop.description,
-						"url" : "http://" + domain + prop.image.url,
+						"url" : prop.image.url,
 						"position_x" : scene_prop.position_x,
 						"position_y" : scene_prop.position_y,
 						"scale" : float(scene_prop.scale),
@@ -205,7 +207,7 @@ def scene_resources(request, scene_id):
 					"id" : background.id,
 					"name" : background.name,
 					"description" : background.description,
-					"url" : "http://" + domain + background.image.url
+					"url" : background.image.url
 				}
 			scene_props = SceneProp.objects.filter(scene=scene)
 			for scene_prop in scene_props:
@@ -215,7 +217,7 @@ def scene_resources(request, scene_id):
 						"id" : prop.id,
 						"name" : prop.name,
 						"description" : prop.description,
-						"url" : "http://" + domain + prop.image.url
+						"url" : prop.image.url
 					}
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -341,7 +343,7 @@ def backgrounds(request):
 				"id" : background.id,
 				"name" : background.name,
 				"description" : background.description,
-				"url" : "http://" + domain + background.image.url
+				"url" : background.image.url
 			}
 			response_data["backgrounds"].append(obj)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -353,7 +355,7 @@ def backgrounds(request):
 			"id" : background_model.id, 
 			"name" :  background_model.name, 
 			"description" : background_model.description, 
-			"url" : "http://" + domain + background_model.image.url 
+			"url" : background_model.image.url 
 		}
 		response_data = {
 			"background" : background_rep,
@@ -376,7 +378,7 @@ def background(request, background_id):
 					"id" : background.id,
 					"name" : background.name,
 					"description" : background.description,
-					"url" : "http://" + domain + background.image.url
+					"url" : background.image.url
 				}
 			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -388,11 +390,19 @@ def background(request, background_id):
 	elif request.method == "DELETE":
 		background = Background.objects.get(id=background_id)
 		# Unset From all scenes
-		background.scene_set.clear()
+		background.scenes.clear()
 		# Delete File
 		if background.image:
-			if background.image.path:
+			if not settings.USE_AWS and background.image.path:
+				# Delete from MEDIA_ROOT
 				os.remove(background.image.path)
+			elif settings.USE_AWS and background.image.name:
+				# Delete from AWS S3
+				connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+				bucket = Bucket(connection, settings.AWS_STORAGE_BUCKET_NAME)
+				fileKey = Key(bucket)
+				fileKey.key = background.image.name
+				bucket.delete_key(fileKey)
 		# Delete from database
 		background.delete()
 		response_data = { "success" : True }
@@ -413,7 +423,7 @@ def props(request):
 				"id" : prop.id,
 				"name" : prop.name,
 				"description" : prop.description,
-				"url" : "http://" + domain + prop.image.url
+				"url" : prop.image.url
 			}
 			response_data["props"].append(obj)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -425,7 +435,7 @@ def props(request):
 			"id" : prop_model.id, 
 			"name" :  prop_model.name, 
 			"description" : prop_model.description,
-			"url" : "http://" + domain + prop_model.image.url 
+			"url" : prop_model.image.url 
 		}
 		response_data = {
 			"prop" : prop_rep,
@@ -448,7 +458,7 @@ def prop(request, prop_id):
 					"id" : prop.id,
 					"name" : prop.name,
 					"description" : prop.description,
-					"url" : "http://" + domain + prop.image.url
+					"url" : prop.image.url
 				}
 			}
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -460,15 +470,23 @@ def prop(request, prop_id):
 	elif request.method == "DELETE":
 		prop = Prop.objects.get(id=prop_id)
 		# Unset From all scenes and delete scene_prop
-		scenes = Scene.objects.filter(background=background)
-		for scene in scenes:
+		scene_props = SceneProp.objects.filter(prop_file=prop)
+		for scene_prop in scene_props:
+			scene = Scene.objects.get(id=scene_prop.scene)
 			scene.props.remove(prop)
-			scene_prop = SceneProp.objects.get(scene=scene,prop_file=prop)
 			scene_prop.delete()
 		# Delete File
 		if prop.image:
-			if prop.image.path:
+			if not settings.USE_AWS and prop.image.path:
+				# Delete from MEDIA_ROOT
 				os.remove(prop.image.path)
+			elif settings.USE_AWS and prop.image.name:
+				# Delete from AWS S3
+				connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+				bucket = Bucket(connection, settings.AWS_STORAGE_BUCKET_NAME)
+				fileKey = Key(bucket)
+				fileKey.key = prop.image.name
+				bucket.delete_key(fileKey)
 		# Delete From Database
 		prop.delete()
 		response_data = { "success" : True }
@@ -481,10 +499,9 @@ def save_file(file, path=''):
 	''' Little helper to save a file
 	'''
 	filename = file._get_name()
-	import time
 	ts = str(int(time.time()))
 	absolute_path = '%s/%s%s-%s' % (settings.MEDIA_ROOT, str(path), ts, str(filename))
-	fd = open(absolute_path, 'wb')
+	fd = storage.open(absolute_path, 'wb')
 	for chunk in file.chunks():
 		fd.write(chunk)
 	fd.close()
