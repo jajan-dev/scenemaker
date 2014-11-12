@@ -252,9 +252,9 @@ $(document).ready(function(){
 
 		createSceneThumbnailImage(scene, function(thumb){
 			// Change Thumbnail
-			var a = $(".scene-thumbnail").filter(function(){
+			$(".scene-thumbnail").filter(function(){
 				return $(this).data("scene-id") === scene.id;
-			})[0].src = thumb.src;
+			}).attr("src", thumb.src);
 		});
 	}
 
