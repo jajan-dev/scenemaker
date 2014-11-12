@@ -236,7 +236,7 @@ $(document).ready(function(){
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
 			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
 			$(thumb).data("scene-id", scene.id);
-			
+			console.log(scene, thumb, thumbRow);
 			// Add Thumbnail to Backgrounds
 			$("#scenes").append(thumbRow);
 
@@ -719,7 +719,7 @@ $(document).ready(function(){
 					callback(propImages);
 				}
 			}
-			img.src = props[i].url;
+			img.src = prop.url;
 		});
 	}
 
