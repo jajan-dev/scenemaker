@@ -2,12 +2,6 @@ $(document).ready(function(){
 
 	// Current Scene loaded in the Client Browser
 	scene = {};
-	var scenes = [];
-	var backgrounds = [];
-	var props = [];
-
-	// Modals
-	propModals = [];
 
 	// Save New Background to Server
 	function newBackground(formData){
@@ -180,7 +174,6 @@ $(document).ready(function(){
 				scene.props[id].position_x = update.update.position_x;
 				scene.props[id].position_y = update.update.position_y;
 				changeSceneThumbnail(scene);
-				changeEditorMenu();
 			},
 			error : function(error){
 				console.log(error.statusText);
@@ -238,65 +231,72 @@ $(document).ready(function(){
 	function addSceneThumbnail(scene){
 
 		// Create Thumbnail
-		var thumb = createSceneThumbnailImage(scene);
+		createSceneThumbnailImage(scene, function(thumb){
+			// Create a New Row in the Background Collection
+			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
+			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
+			$(thumb).data("scene-id", scene.id);
+			
+			// Add Thumbnail to Backgrounds
+			$("#scenes").append(thumbRow);
 
-		// Create a New Row in the Background Collection
-		var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
-		$(thumbRow).data("scene-id", scene.id);
-		
-		// Add Thumbnail to Backgrounds
-		$("#scenes").append(thumbRow);
-
-		// Event Listener for Background Thumbnail - Selection / Set
-		$(thumb).dblclick(function(event){
-			// Set Current Scene using Scene Data Model Representation
-			changeScene(scene);
+			// Event Listener for Background Thumbnail - Selection / Set
+			$(thumb).dblclick(function(event){
+				// Set Current Scene using Scene Data Model Representation
+				changeScene(scene);
+			});
 		});
 	}
 
 	function changeSceneThumbnail(scene){
 
-		var newThumbnailData = createSceneThumbnailImage(scene).src;
-
-		// Change Thumbnail
-		var sceneThumbnail = $(".scene-thumbnail-row").filter(function(){
-			return $(this).data("scene-id") === scene.id;
-		}).find(".scene-thumbnail")[0];
-		sceneThumbnail.src = newThumbnailData;
+		createSceneThumbnailImage(scene, function(thumb){
+			// Change Thumbnail
+			var a = $(".scene-thumbnail").filter(function(){
+				return $(this).data("scene-id") === scene.id;
+			})[0].src = thumb.src;
+		});
 	}
 
-	function createSceneThumbnailImage(scene){
+	function createSceneThumbnailImage(scene, callback){
 		
 		// Create Temporary Canvas
 		var canvas = $("<canvas></canvas>")[0];
+		canvas.width = 1920;
+		canvas.height = 1080;
 		var ctx = canvas.getContext('2d');
 
 		// Create a Thumbnail
 		var thumb = new Image();
-		$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
 
 		// Draw Background
 		var backgroundImage = new Image();
-		backgroundImage.src = scene.background.url || "";
-		canvas.width = 1920;
-		canvas.height = 1080;
-		ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height);
-
-		// Draw Props
-		for (var i in scene.props){
-			var prop = scene.props[i];
-			var propImage = new Image();
-			propImage.src = prop.url;
-			var left = prop["position_x"];
-			var top = prop["position_y"];
-
-			ctx.drawImage(propImage,left,top);
+		backgroundImage.onload = function(){
+			backgroundImage.width *= scene.background_scale;
+			backgroundImage.height *= scene.background_scale;
+			ctx.drawImage(this, 0, 0, backgroundImage.width, backgroundImage.height);
+			multiplePropThumbnailLoader(scene.props, propsLoaded);
 		}
+		backgroundImage.src = scene.background.url || "";
 
-		// Return Image
-		var imageDataURL = canvas.toDataURL();
-		thumb.src = imageDataURL;
-		return thumb;
+		function propsLoaded(propImages){
+			for (var i in propImages){
+				var prop = propImages[i].prop;
+				var image = propImages[i].image;
+				var left = prop["position_x"];
+				var top = prop["position_y"];
+				image.width *= prop["scale"];
+				image.height *= prop["scale"];
+				ctx.drawImage(image, left, top, image.width, image.height);
+			}
+			var imageDataURL = canvas.toDataURL();
+			var onLoad = function(e){
+				thumb.removeEventListener("load", onLoad);
+				callback(thumb);
+			}
+			thumb.addEventListener("load", onLoad, false);
+			thumb.src = imageDataURL;
+		}
 	}
 
 	// Change Scene Client Model
@@ -307,8 +307,8 @@ $(document).ready(function(){
 
 	// Change Scene in the DOM
 	function renderSceneView(){
-		background = scene.background;
-		props = scene.props;
+		var background = scene.background;
+		var props = scene.props;
 		clearSceneView();
 		renderBackgroundView(background);
 		for (var i in props){
@@ -425,6 +425,7 @@ $(document).ready(function(){
 
 		}
 		renderSceneView();
+		changeSceneThumbnail(scene);
 	}
 
 	function updateSceneProp(data){
@@ -456,6 +457,7 @@ $(document).ready(function(){
 			sceneProp.rotation = update["rotation"];
 		}
 		renderSceneView();
+		changeSceneThumbnail(scene);
 	}
 
 	// CLIENT EVENTS //
@@ -664,7 +666,6 @@ $(document).ready(function(){
 
 	$("#update-prop-btn").click(function(event){
 		var prop = $(this).data("prop");
-		console.log(prop);
 		var data = {
 			"update" : {
 				"type" : "PROP",
@@ -694,6 +695,34 @@ $(document).ready(function(){
 		});
 	});
 
+	function multiplePropThumbnailLoader(props, callback){
+		if (!props){
+			return;
+		}
+		if ("undefined" === Object.keys(props).length){
+			props = [props];
+		}
+		var count = Object.keys(props).length;
+		var propImages = [];
+
+		$.each(props, function(i,prop){
+			var img = new Image();
+			var propImage = {
+				prop : prop,
+				image : img
+			};
+
+			img.onload = function(){
+				propImages.push(propImage);
+				count--;
+				if (count === 0){
+					callback(propImages);
+				}
+			}
+			img.src = props[i].url;
+		});
+	}
+
 	// Slider Displays Value
 	$(".slider").on("input", function(event){
 		var self = this;
@@ -707,7 +736,7 @@ $(document).ready(function(){
 		type: "GET",
 		url: "/api/scenes",
 		success: function(result){
-			scenes = result.scenes;
+			var scenes = result.scenes;
 			for (var i in scenes){
 				var load_scene = scenes[i];
 				var props_array = load_scene.props;
@@ -727,7 +756,7 @@ $(document).ready(function(){
 		type: "GET",
 		url: "/api/backgrounds",
 		success: function(result){
-			backgrounds = result.backgrounds;
+			var backgrounds = result.backgrounds;
 			for (var i in backgrounds){
 				var background = backgrounds[i];
 				newBackgroundView(background);
@@ -740,7 +769,7 @@ $(document).ready(function(){
 		type: "GET",
 		url: "/api/props",
 		success: function(result){
-			props = result.props;
+			var props = result.props;
 			for (var i in props){
 				var prop = props[i];
 				newPropView(prop);
