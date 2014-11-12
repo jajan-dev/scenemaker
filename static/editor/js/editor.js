@@ -6,6 +6,9 @@ $(document).ready(function(){
 	var backgrounds = [];
 	var props = [];
 
+	// Modals
+	propModals = [];
+
 	// Save New Background to Server
 	function newBackground(formData){
 		$.ajax({
@@ -64,7 +67,7 @@ $(document).ready(function(){
 				scene.background = background;
 
 				// Set Current Scene's Background in the DOM
-				setBackgroundView(background);
+				renderBackgroundView(background);
 
 				// Update Client Scene Thumbnail
 				changeSceneThumbnail(scene);
@@ -77,10 +80,16 @@ $(document).ready(function(){
 	}
 
 	// Set Current Scene's Background in the DOM
-	function setBackgroundView(background){
+	function renderBackgroundView(background){
 		$("#scene-background-image").attr("src", background.url || "")
 			.css("display", "block")
 			.attr("draggable", false);
+		var tempBackground = new Image();
+		tempBackground.src = background.url || "";
+		var width = tempBackground.width;
+		var height = tempBackground.height;
+		$("#scene-background-image")[0].width = scene.background_scale * width;
+		$("#scene-background-image")[0].height = scene.background_scale * height;
 		changeEditorMenu();
 	}
 
@@ -113,7 +122,7 @@ $(document).ready(function(){
 		$("#props").append(thumbRow);
 
 		$(thumb).dblclick(function(event){
-			if (!scene.hasOwnProperty("id")){
+			if (!scene.hasOwnProperty("id") || scene.background.url === ""){
 				// Scene Must be Set First
 				return false;
 			}
@@ -128,7 +137,8 @@ $(document).ready(function(){
 			url : "/api/scenes/" + scene.id + "/props/add",
 			data : JSON.stringify({ prop : prop.id }),
 			success : function(result){
-				addPropView(result.prop)
+				scene.props[result.prop.scene_prop_id] = result.prop;
+				renderPropView(result.prop)
 				changeEditorMenu();
 			},
 			error : function(error){
@@ -138,16 +148,25 @@ $(document).ready(function(){
 	}
 
 	// Add Prop to Current Scene in the DOM
-	function addPropView(prop){
-		scene.props[prop.scene_prop_id] = prop;
+	function renderPropView(prop){
 		var image = new Image();
 		image.src = prop.url || "";
 		$(image).data("scene-prop-id", prop.scene_prop_id);
 		image.draggable = true;
 		$(image).addClass("prop");
-		$(".scene-props").append(image);
+
+		// Position
 		image.style.left = prop.position_x ? prop.position_x + "px" : "0px";
 		image.style.top = prop.position_y ? prop.position_y + "px" : "0px";
+
+		// Scaling
+		image.width *= prop.scale;
+		image.height *= prop.scale;
+
+		// Index
+		image.style.zIndex = 4000 - prop.index;
+
+		$(".scene-props").append(image);
 	}
 
 	// Update Prop Position on Server
@@ -259,8 +278,8 @@ $(document).ready(function(){
 		// Draw Background
 		var backgroundImage = new Image();
 		backgroundImage.src = scene.background.url || "";
-		canvas.width = 1920 || backgroundImage.width;
-		canvas.height = 1080 || backgroundImage.height;
+		canvas.width = 1920;
+		canvas.height = 1080;
 		ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height);
 
 		// Draw Props
@@ -283,18 +302,19 @@ $(document).ready(function(){
 	// Change Scene Client Model
 	function changeScene(new_scene){
 		scene = new_scene;
-		changeSceneView();
+		renderSceneView();
 	}
 
 	// Change Scene in the DOM
-	function changeSceneView(){
+	function renderSceneView(){
 		background = scene.background;
 		props = scene.props;
 		clearSceneView();
-		setBackgroundView(background);
+		renderBackgroundView(background);
 		for (var i in props){
 			var prop = props[i];
-			addPropView(prop);
+			scene.props[prop.scene_prop_id] = prop;
+			renderPropView(prop);
 		}
 
 		// Update Editor
@@ -316,9 +336,19 @@ $(document).ready(function(){
 		$("#editor-scene-name-value").text(scene.name);
 		$("#editor-scene-description-value").text(scene.description);
 		$("#editor-scene-version-value").text(scene.version);
+		$("#edit-scene-btn").removeClass("disabled");
 		
 		// Change Background
-		$("#editor-background .background-thumbnail").attr("src", scene.background.url || "");
+		$("#editor-background .background-thumbnail")
+			.attr("src", scene.background.url || "")
+			.removeClass("disabled")
+			.attr("data-toggle", "modal")
+			.attr("data-target", "#background-modal")
+			.click(function(event){
+				if (!scene.background.url || scene.background.url === ""){
+					return false;
+				}
+			});
 		
 		// Change Props
 		$("#editor-props").html("");
@@ -328,9 +358,104 @@ $(document).ready(function(){
 			}
 			var propImage = new Image();
 			propImage.src = prop.url;
-			$(propImage).addClass("img-thumbnail").addClass("prop-thumbnail");
+			$(propImage).addClass("img-thumbnail")
+				.addClass("prop-thumbnail")
+				.attr("data-toggle", "modal")
+				.attr("data-target", "#prop-modal")
+				.data("prop", prop)
+				.removeClass("disabled");
 			$("#editor-props").append(propImage);
 		});
+	}
+
+	function updateMetadata(data){
+		$.ajax({
+			type : "PUT",
+			url : "/api/scenes/" + scene.id,
+			data : JSON.stringify(data),
+			success : function(result){
+				updateMetadataModel(data.update)
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+	}
+
+	function updateMetadataModel(update){
+		if (update.hasOwnProperty("name")){
+			scene.name = update["name"]; // Model
+			$("#editor-scene-name-value").text(update["name"]); // View
+		}
+		if (update.hasOwnProperty("description")){
+			scene.description = update["description"]; // Model
+			$("#editor-scene-description-value").text(update["description"]); // View
+		}
+		if (update.hasOwnProperty("version")){
+			scene.version = update["version"]; // Model
+			$("#editor-scene-version-value").text(update["version"]); // View
+		}
+	}
+
+	function updateBackground(data){
+		$.ajax({
+			type : "PUT",
+			url : "/api/scenes/" + scene.id,
+			data : JSON.stringify(data),
+			success : function(result){
+				updateBackgroundModel(data.update);
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+	}
+
+	function updateBackgroundModel(update){
+		if (update.hasOwnProperty("background_scale")){
+			
+			// Update Client Model
+			scene.background_scale = update["background_scale"];
+
+			// Get Original Dimensions
+			var tempBackground = new Image();
+			tempBackground.src = scene.background.url || "";
+			var width = tempBackground.width;
+			var height = tempBackground.height;
+
+		}
+		renderSceneView();
+	}
+
+	function updateSceneProp(data){
+		$.ajax({
+			type : "PUT",
+			url : "/api/scenes/" + scene.id,
+			data : JSON.stringify(data),
+			success : function(result){
+				updateScenePropModel(data.update);
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+	}
+
+	function updateScenePropModel(update){
+		if (!update.hasOwnProperty("scene_prop")){
+			return false;
+		}
+		var sceneProp = scene.props[update["scene_prop"]];
+		if (update.hasOwnProperty("scale")){
+			sceneProp.scale = update["scale"];
+		}
+		if (update.hasOwnProperty("index")){
+			sceneProp.index = update["index"];
+		}
+		if (update.hasOwnProperty("rotation")){
+			sceneProp.rotation = update["rotation"];
+		}
+		renderSceneView();
 	}
 
 	// CLIENT EVENTS //
@@ -492,6 +617,87 @@ $(document).ready(function(){
 		data.append("description", "");
 
 		newProp(data);
+	});
+
+	// Modal Event Listeners
+	$("#metadata-modal").on("show.bs.modal", function(event){
+		$("#edit-metadata-name").val(scene.name);
+		$("#edit-metadata-description").val(scene.description);
+		$("#edit-metadata-version").val(scene.version);
+	});
+
+	$("#background-modal").on("show.bs.modal", function(event){
+		$("#edit-background-scale").val(scene["background_scale"]);
+	});
+
+	$("#prop-modal").on("show.bs.modal", function(event){
+		var element = event.relatedTarget;
+		var prop = $(element).data("prop");
+		$("#update-prop-btn").data("prop", prop);
+		// Load Modal Based on Prop
+		$("#edit-prop-scale").val(prop.scale);
+		$("#edit-prop-index").val(prop.index);
+		$("#edit-prop-index-value").text($("#edit-prop-index").val());
+	});
+
+	$("#update-metadata-btn").click(function(event){
+		var data = {
+			"update" : {
+				"type" : "META",
+				"name" : $("#edit-metadata-name").val(),
+				"description" : $("#edit-metadata-description").val(),
+				"version" : $("#edit-metadata-version").val()
+			}
+		}
+		updateMetadata(data);
+	});
+
+	$("#update-background-btn").click(function(event){
+		var data = {
+			"update" : {
+				"type" : "BACKGROUND",
+				"background_scale" : parseFloat($("#edit-background-scale").val())
+			}
+		}
+		updateBackground(data);
+	});
+
+	$("#update-prop-btn").click(function(event){
+		var prop = $(this).data("prop");
+		console.log(prop);
+		var data = {
+			"update" : {
+				"type" : "PROP",
+				"scene_prop" : prop.scene_prop_id,
+				"scale" : parseFloat($("#edit-prop-scale").val()),
+				"index" : parseInt($("#edit-prop-index").val(), 10),
+				"rotation" : parseFloat($("#edit-prop-rotation").val() || "0.0"),
+			}
+		}
+		updateSceneProp(data);
+	});
+
+	// Helper Functions and Event Listeners
+	$('.float-input').keypress(function(event) {
+		if ((event.which != 46 || $(this).val().indexOf('.') != -1) && 
+			(event.which < 48 || event.which > 57) || 
+			(event.which == 46 && $(this).caret().start == 0)) {
+			event.preventDefault();
+			return false;
+		}
+
+		// this part is when left part of number is deleted and leaves a . in the leftmost position. For example, 33.25, then 33 is deleted
+		$('.float-input').keyup(function(event) {
+			if ($(this).val().indexOf('.') == 0) {
+				$(this).val($(this).val().substring(1));
+			}
+		});
+	});
+
+	// Slider Displays Value
+	$(".slider").on("input", function(event){
+		var self = this;
+		$(".slider-value").text($(self).val());
 	});
 
 	// Initializtion

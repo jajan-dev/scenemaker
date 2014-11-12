@@ -103,6 +103,7 @@
                                 <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
                                 <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
                                 <div id="editor-scene-version">Version: <span id="editor-scene-version-value"></span></div>
+                                <div id="edit-scene-btn" class="btn btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
                             </div>
                             <div class="tab-section">
                                 <h2>Background</h2>
@@ -171,5 +172,96 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <!-- Edit Metadata -->
+    <div class="modal fade" id="metadata-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Edit Metadata</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-metadata-form" role="form">
+                        <div class="form-group">
+                            <label for="edit-metadata-name">Name: </label>
+                            <input class="form-control" id="edit-metadata-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-metadata-description">Description: </label>
+                            <input class="form-control" id="edit-metadata-description">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-metadata-version">Version: </label>
+                            <input class="form-control" id="edit-metadata-version">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-metadata-btn">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Background -->
+    <div class="modal fade" id="background-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Edit Background</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-background-form" role="form">
+                        <div class="form-group">
+                            <label for="edit-background-scale">Scale: </label>
+                            <input class="form-control float-input" id="edit-background-scale" type="number" step=0.01>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-background-btn">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Prop -->
+    <div class="modal fade" id="prop-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Edit Scene Prop</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-prop-form" role="form">
+                        <div class="form-group">
+                            <label for="edit-prop-scale">Scale: </label>
+                            <input class="form-control float-input" id="edit-prop-scale" type="number" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-prop-index">Index: </label>
+                            <input id="edit-prop-index" class="slider" type="range" step="1" min="500" max="4000"><span id="edit-prop-index-value" class="slider-value"></span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-prop-btn">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

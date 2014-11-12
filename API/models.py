@@ -26,7 +26,7 @@ class SceneProp(models.Model):
 	scale = models.DecimalField(decimal_places=2,max_digits=8, default=1.0)
 	position_x = models.IntegerField(default=0)
 	position_y = models.IntegerField(default=0)
-	index = models.IntegerField(default=0)
+	index = models.IntegerField(default=500)
 	rotation = models.DecimalField(decimal_places=2,max_digits=8, default=0.0)
 
 
