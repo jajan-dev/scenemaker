@@ -75,11 +75,11 @@ $(document).ready(function(){
 
 	// Set Current Scene's Background in the DOM
 	function renderBackgroundView(background){
-		$("#scene-background-image").attr("src", background.url || "/static/editor/img/undefined.png")
+		$("#scene-background-image").attr("src", background.url || "")
 			.css("display", "block")
 			.attr("draggable", false);
 		var tempBackground = new Image();
-		tempBackground.src = background.url || "/static/editor/img/undefined.png";
+		tempBackground.src = background.url || "";
 		var width = tempBackground.width;
 		var height = tempBackground.height;
 		$("#scene-background-image")[0].width = scene.background_scale * width;
@@ -144,7 +144,7 @@ $(document).ready(function(){
 	// Add Prop to Current Scene in the DOM
 	function renderPropView(prop){
 		var image = new Image();
-		image.src = prop.url || "/static/editor/img/undefined.png";
+		image.src = prop.url || "";
 		$(image).data("scene-prop-id", prop.scene_prop_id);
 		image.draggable = true;
 		$(image).addClass("prop");
@@ -721,7 +721,7 @@ $(document).ready(function(){
 					callback(propImages);
 				}
 			}
-			img.src = props[i].url;
+			img.src = prop.url || "";
 		});
 	}
 
