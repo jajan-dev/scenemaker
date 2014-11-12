@@ -287,7 +287,7 @@ def add_scene_background(request, scene_id):
 						"id" : background_id, 
 						"name" :  background.name,
 						"description" : background.description,
-						"url" : "http://" + request.get_host() + background.image.url
+						"url" : background.image.url
 					} 
 				}
 				return HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -315,7 +315,7 @@ def add_scene_prop(request, scene_id):
 						"scene_prop_id" : new_sceneprop.id,
 						"name" : prop.name,
 						"description" : prop.description,
-						"url" : "http://" + request.get_host() + prop.image.url,
+						"url" : prop.image.url,
 						"scale" : new_sceneprop.scale,
 						"position_x" : new_sceneprop.position_x,
 						"position_y" : new_sceneprop.position_y,
