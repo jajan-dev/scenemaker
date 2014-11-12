@@ -704,7 +704,9 @@ $(document).ready(function(){
 		}
 		var count = Object.keys(props).length;
 		var propImages = [];
-
+		if (count === 0){
+			return callback(propImages);
+		}
 		$.each(props, function(i,prop){
 			var img = new Image();
 			var propImage = {
