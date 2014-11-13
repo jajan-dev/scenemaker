@@ -2,6 +2,14 @@
 	display: none;
 }
 
+#navbar-container {
+	z-index: 5000;
+}
+
+#sidebar {
+	z-index: 5000;
+}
+
 .main-content {
 	position: relative;
 	top: 50px;

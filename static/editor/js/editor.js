@@ -86,6 +86,10 @@ $(document).ready(function(){
 			var height = tempBackground.height;
 			$("#scene-background-image")[0].width = scene.background_scale * width;
 			$("#scene-background-image")[0].height = scene.background_scale * height;
+			if (!$("#scene-background-image")[0].src || $("#scene-background-image")[0].src === ""){
+				$("#scene-background-image")[0].width = 0;
+				$("#scene-background-image")[0].height = 0;
+			}
 			changeEditorMenu();
 		}
 		tempBackground.src = background.url || "";
