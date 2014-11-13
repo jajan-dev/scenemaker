@@ -81,12 +81,14 @@ $(document).ready(function(){
 			.attr("draggable", false);
 		var tempBackground = new Image();
 		tempBackground.crossOrigin = "Anonymous";
+		tempBackground.onload = function(){
+			var width = tempBackground.width;
+			var height = tempBackground.height;
+			$("#scene-background-image")[0].width = scene.background_scale * width;
+			$("#scene-background-image")[0].height = scene.background_scale * height;
+			changeEditorMenu();
+		}
 		tempBackground.src = background.url || "";
-		var width = tempBackground.width;
-		var height = tempBackground.height;
-		$("#scene-background-image")[0].width = scene.background_scale * width;
-		$("#scene-background-image")[0].height = scene.background_scale * height;
-		changeEditorMenu();
 	}
 
 	// Save New Prop to Server
@@ -136,7 +138,7 @@ $(document).ready(function(){
 			success : function(result){
 				scene.props[result.prop.scene_prop_id] = result.prop;
 				renderPropView(result.prop)
-				changeEditorMenu();
+				changeSceneThumbnail(scene);
 			},
 			error : function(error){
 				console.log(error.statusText);
@@ -165,6 +167,8 @@ $(document).ready(function(){
 		image.style.zIndex = 4000 - prop.index;
 
 		$(".scene-props").append(image);
+
+		changeEditorMenu();
 	}
 
 	// Update Prop Position on Server
@@ -229,6 +233,9 @@ $(document).ready(function(){
 
 		// Update Editor Menu
 		changeEditorMenu();
+
+		// Switch to Editor Menu
+		$("#editor-tab").tab("show");
 
 	}
 
@@ -351,7 +358,7 @@ $(document).ready(function(){
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
 			.click(function(event){
-				if (!scene.background.url || scene.background.url === ""){
+				if (!scene.background || !scene.background.url || scene.background.url === ""){
 					return false;
 				}
 			});
