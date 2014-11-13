@@ -66,6 +66,9 @@ $(document).ready(function(){
 
 				// Update Client Scene Thumbnail
 				changeSceneThumbnail(scene);
+
+				// Update Editor Menu
+				changeEditorMenu();
 			},
 			error : function(error){
 				// BAD
@@ -86,11 +89,6 @@ $(document).ready(function(){
 			var height = tempBackground.height;
 			$("#scene-background-image")[0].width = scene.background_scale * width;
 			$("#scene-background-image")[0].height = scene.background_scale * height;
-			if (!$("#scene-background-image")[0].src || $("#scene-background-image")[0].src === ""){
-				$("#scene-background-image")[0].width = 0;
-				$("#scene-background-image")[0].height = 0;
-			}
-			changeEditorMenu();
 		}
 		tempBackground.src = background.url || "";
 	}
@@ -341,7 +339,9 @@ $(document).ready(function(){
 
 	// Resets Scene to Empty View
 	function clearSceneView(){
-		$("#scene-background-image").attr("src", "");
+		$("#scene-background-image")[0].width = 0;
+		$("#scene-background-image")[0].height = 0;
+		$("#scene-background-image").attr("src", null);
 		$(".scene-props").html("");
 		return true;
 	}
