@@ -28,6 +28,7 @@ $(document).ready(function(){
 
 		// Create a Thumbnail
 		var thumb = new Image();
+		thumb.crossOrigin = "Anonymous";
 		thumb.src = background.url || "/media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail");
 
@@ -79,6 +80,7 @@ $(document).ready(function(){
 			.css("display", "block")
 			.attr("draggable", false);
 		var tempBackground = new Image();
+		tempBackground.crossOrigin = "Anonymous";
 		tempBackground.src = background.url || "";
 		var width = tempBackground.width;
 		var height = tempBackground.height;
@@ -110,6 +112,7 @@ $(document).ready(function(){
 	function newPropView(prop){
 
 		var thumb = new Image();
+		thumb.crossOrigin = "Anonymous";
 		thumb.src = prop.url || "/media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail");
 		var thumbRow = $("<div></div>").append(thumb);
@@ -144,6 +147,7 @@ $(document).ready(function(){
 	// Add Prop to Current Scene in the DOM
 	function renderPropView(prop){
 		var image = new Image();
+		image.crossOrigin = "Anonymous";
 		image.src = prop.url || "";
 		$(image).data("scene-prop-id", prop.scene_prop_id);
 		image.draggable = true;
@@ -268,9 +272,11 @@ $(document).ready(function(){
 
 		// Create a Thumbnail
 		var thumb = new Image();
+		thumb.crossOrigin = "Anonymous";
 
 		// Draw Background
 		var backgroundImage = new Image();
+		backgroundImage.crossOrigin = "Anonymous";
 		backgroundImage.onload = function(){
 			backgroundImage.width *= scene.background_scale;
 			backgroundImage.height *= scene.background_scale;
@@ -357,6 +363,7 @@ $(document).ready(function(){
 				return false;
 			}
 			var propImage = new Image();
+			propImage.crossOrigin = "Anonymous";
 			propImage.src = prop.url;
 			$(propImage).addClass("img-thumbnail")
 				.addClass("prop-thumbnail")
@@ -419,6 +426,7 @@ $(document).ready(function(){
 
 			// Get Original Dimensions
 			var tempBackground = new Image();
+			tempBackground.crossOrigin = "Anonymous";
 			tempBackground.src = scene.background.url || "/static/editor/img/undefined.png";
 			var width = tempBackground.width;
 			var height = tempBackground.height;
@@ -709,6 +717,7 @@ $(document).ready(function(){
 		}
 		$.each(props, function(i,prop){
 			var img = new Image();
+			img.crossOrigin = "Anonymous";
 			var propImage = {
 				prop : prop,
 				image : img
