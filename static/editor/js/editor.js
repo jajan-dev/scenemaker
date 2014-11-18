@@ -570,6 +570,7 @@ $(document).ready(function(){
 			}
 		};
 		moveProp(scenePropId, update_data);
+		console.log("HEY");
 	}
 
 	// New Scene Event Listener
