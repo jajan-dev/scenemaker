@@ -761,6 +761,7 @@ $(document).ready(function(){
 		success: function(result){
 			var scenes = result.scenes;
 			for (var i in scenes){
+				console.log(scenes[i]);
 				var load_scene = scenes[i];
 				var props_array = load_scene.props;
 				load_scene.props = {};
