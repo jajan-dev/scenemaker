@@ -292,7 +292,7 @@ $(document).ready(function(){
 			ctx.drawImage(this, 0, 0, backgroundImage.width, backgroundImage.height);
 			multiplePropThumbnailLoader(scene.props, propsLoaded);
 		}
-		backgroundImage.src = scene.background.url || "/static/editor/img/undefined.png";
+		backgroundImage.src = scene.background.url || "/static/editor/img/blank-background.jpg";
 
 		function propsLoaded(propImages){
 			for (var i in propImages){
@@ -357,7 +357,7 @@ $(document).ready(function(){
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
-			.attr("src", scene.background.url || "/static/editor/img/undefined.png")
+			.attr("src", scene.background.url || "/static/editor/img/blank-background.jpg")
 			.removeClass("disabled")
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
@@ -395,7 +395,7 @@ $(document).ready(function(){
 				updateMetadataModel(data.update)
 			},
 			error : function(error){
-				console.log(error);
+				console.log(error.statusText);
 			}
 		});
 	}
@@ -424,7 +424,7 @@ $(document).ready(function(){
 				updateBackgroundModel(data.update);
 			},
 			error : function(error){
-				console.log(error);
+				console.log(error.statusText);
 			}
 		});
 	}
@@ -438,7 +438,7 @@ $(document).ready(function(){
 			// Get Original Dimensions
 			var tempBackground = new Image();
 			tempBackground.crossOrigin = "Anonymous";
-			tempBackground.src = scene.background.url || "/static/editor/img/undefined.png";
+			tempBackground.src = scene.background.url || "/static/editor/img/blank-background.jpg";
 			var width = tempBackground.width;
 			var height = tempBackground.height;
 
@@ -456,7 +456,7 @@ $(document).ready(function(){
 				updateScenePropModel(data.update);
 			},
 			error : function(error){
-				console.log(error);
+				console.log(error.statusText);
 			}
 		});
 	}
@@ -570,7 +570,6 @@ $(document).ready(function(){
 			}
 		};
 		moveProp(scenePropId, update_data);
-		console.log("HEY");
 	}
 
 	// New Scene Event Listener
@@ -723,7 +722,6 @@ $(document).ready(function(){
 			props = [props];
 		}
 		var count = Object.keys(props).length;
-		console.log(count);
 		var propImages = [];
 		if (count === 0){
 			return callback(propImages);
@@ -762,7 +760,6 @@ $(document).ready(function(){
 		success: function(result){
 			var scenes = result.scenes;
 			for (var i in scenes){
-				console.log(scenes[i]);
 				var load_scene = scenes[i];
 				var props_array = load_scene.props;
 				load_scene.props = {};
@@ -783,7 +780,6 @@ $(document).ready(function(){
 		success: function(result){
 			var backgrounds = result.backgrounds;
 			for (var i in backgrounds){
-				console.log(backgrounds);
 				var background = backgrounds[i];
 				newBackgroundView(background);
 			}
