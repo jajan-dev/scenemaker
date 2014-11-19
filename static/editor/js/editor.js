@@ -723,6 +723,7 @@ $(document).ready(function(){
 			props = [props];
 		}
 		var count = Object.keys(props).length;
+		console.log(count);
 		var propImages = [];
 		if (count === 0){
 			return callback(propImages);
@@ -782,6 +783,7 @@ $(document).ready(function(){
 		success: function(result){
 			var backgrounds = result.backgrounds;
 			for (var i in backgrounds){
+				console.log(backgrounds);
 				var background = backgrounds[i];
 				newBackgroundView(background);
 			}
