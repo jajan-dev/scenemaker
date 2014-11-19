@@ -247,7 +247,7 @@ $(document).ready(function(){
 		createSceneThumbnailImage(scene, function(thumb){
 			// Create a New Row in the Background Collection
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
-			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb);
+			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb).data("scene-id", scene.id);
 			$(thumb).data("scene-id", scene.id);
 			
 			// Add Thumbnail to Backgrounds
@@ -349,15 +349,18 @@ $(document).ready(function(){
 	// Update Editor Menu With Current Scene
 	function changeEditorMenu(){
 
+		scene = scene || {};
+
 		// Change Metadata
-		$("#editor-scene-name-value").text(scene.name);
-		$("#editor-scene-description-value").text(scene.description);
-		$("#editor-scene-version-value").text(scene.version);
-		$("#edit-scene-btn").removeClass("disabled");
+		$("#editor-scene-name-value").text(scene.name || "");
+		$("#editor-scene-description-value").text(scene.description || "");
+		$("#editor-scene-version-value").text(scene.version || "");
+		scene.id ? $("#edit-scene-btn").removeClass("disabled") : $("#edit-scene-btn").addClass("disabled");
+		scene.id ? $("#delete-scene-btn").removeClass("disabled") : $("#delete-scene-btn").addClass("disabled");
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
-			.attr("src", scene.background.url || "/static/editor/img/blank-background.jpg")
+			.attr("src", (scene.background && scene.background.url) || "/static/editor/img/blank-background.jpg")
 			.removeClass("disabled")
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
@@ -369,7 +372,7 @@ $(document).ready(function(){
 		
 		// Change Props
 		$("#editor-props").html("");
-		$.each(scene.props, function(i,prop){
+		$.each(scene.props || [], function(i,prop){
 			if (!prop.url){
 				return false;
 			}
@@ -477,6 +480,40 @@ $(document).ready(function(){
 		}
 		renderSceneView();
 		changeSceneThumbnail(scene);
+	}
+
+	function deleteScene(){
+		$.ajax({
+			type : "DELETE",
+			url : "/api/scenes/" + scene.id,
+			success : function(result){
+				console.log(result);
+				if (result.success){
+					deleteSceneView(scene.id);
+				}
+			},
+			error : function(error){
+				console.log(error.statusText);
+			}
+		})
+	}
+
+	function deleteSceneView(scene_id){
+		
+		// Clear Scene View
+		clearSceneView();
+
+		// Remove From Scenes Tab
+		$(".scene-thumbnail-row").filter(function(){
+			return $(this).data("scene-id") === scene_id;
+		}).remove();
+
+		// Update Model
+		scene = {};
+
+		// Update Editor Menu
+		changeEditorMenu();
+
 	}
 
 	// CLIENT EVENTS //
@@ -695,6 +732,10 @@ $(document).ready(function(){
 			}
 		}
 		updateSceneProp(data);
+	});
+
+	$("#delete-scene-btn-action").click(function(event){
+		deleteScene();
 	});
 
 	// Helper Functions and Event Listeners

@@ -182,8 +182,15 @@ def scene(request, scene_id):
 		else:
 			return HttpResponse(status=400)
 	elif request.method == "DELETE":
-		# DELETE - later
-		pass
+		scene = Scene.objects.get(id=scene_id)
+		# delete all scene_props from the scene
+		scene_props = SceneProp.objects.filter(scene=scene)
+		for scene_prop in scene_props:
+			scene_prop.delete()
+		# delete scene
+		scene.delete()
+		response_data = { "success" : True }
+		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	else:
 		return HttpResponseNotAllowed(['GET', 'PUT', 'DELETE'])
 
