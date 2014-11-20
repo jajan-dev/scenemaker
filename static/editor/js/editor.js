@@ -639,6 +639,8 @@ $(document).ready(function(){
 		// Get Metadata
 		var name = $("#new-scene-name").val();
 		var description = $("#new-scene-description").val()
+
+		console.log(name,description);
 		
 		// Create New Scene on Server
 		newScene(name, description);
@@ -666,8 +668,8 @@ $(document).ready(function(){
 		});
 
 		// Background Image Metadata - TODO
-		data.append("name", "testing the backgrond upload");
-		data.append("description", "");
+		data.append("name", "BACKGROUND_NAME");
+		data.append("description", "BACKGROUND_DESCRIPTION");
 		
 		// Save New Background to Server
 		newBackground(data);
@@ -695,8 +697,8 @@ $(document).ready(function(){
 		});
 
 		// Prop Image Metadata - TODO
-		data.append("name", "testing the prop upload");
-		data.append("description", "");
+		data.append("name", "SCENEPROP_NAME");
+		data.append("description", "SCENEPROP_DESCRIPTION");
 
 		newProp(data);
 	});

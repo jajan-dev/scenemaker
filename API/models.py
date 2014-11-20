@@ -18,6 +18,9 @@ class Scene(models.Model):
 	## Props
 	props = models.ManyToManyField('Prop', through='SceneProp')
 
+	def __unicode__(self):
+		return self.name
+
 
 class SceneProp(models.Model):
 
@@ -32,6 +35,9 @@ class SceneProp(models.Model):
 	index = models.IntegerField(default=500)
 	rotation = models.DecimalField(decimal_places=2,max_digits=8, default=0.0)
 
+	def __unicode__(self):
+		return self.scene.name + " - " + self.prop_file.name
+
 
 class Background(models.Model):
 
@@ -42,6 +48,9 @@ class Background(models.Model):
 	## Image Data
 	image = models.ImageField(upload_to='backgrounds/')
 
+	def __unicode__(self):
+		return self.name
+
 
 class Prop(models.Model):
 
@@ -51,3 +60,6 @@ class Prop(models.Model):
 
 	## Image Data
 	image = models.ImageField(upload_to='props/')
+
+	def __unicode__(self):
+		return self.name

@@ -80,7 +80,7 @@ def scenes(request):
 					"id" : new_scene.id,
 					"name" : new_scene.name,
 					"description" : new_scene.description,
-					"version" : new_scene.version,
+					"version" : new_scene.version.isoformat(' '),
 					"background" : {
 						"id" : "",
 						"name" : "",
