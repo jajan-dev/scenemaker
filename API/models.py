@@ -9,7 +9,7 @@ class Scene(models.Model):
 	version = models.DateTimeField(auto_now=True)
 
 	## Thumbnail
-	thumbnail = models.ImageField(upload_to='scene-thumbnails/')
+	thumbnail = models.ImageField(upload_to='scene-thumbnails/', blank=True, null=True)
 	
 	## Background
 	background = models.ForeignKey('Background', related_name='scenes', related_query_name='scenes', blank=True, null=True)
