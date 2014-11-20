@@ -29,9 +29,14 @@ def scenes(request):
 				scene_rep = {
 					"id" : scene.id,
 					"name" : scene.name,
-					"version" : scene.version,
+					"version" : scene.version.isoformat(' '),
 					"description" : scene.description,
-					"background" : {},
+					"background" : {
+						"id" : "",
+						"name" : "",
+						"description" : "",
+						"url" : "/static/editor/img/blank-background.jpg"
+					},
 					"background_scale" : float(scene.background_scale),
 					"props" : []
 				}
@@ -67,7 +72,7 @@ def scenes(request):
 		# New Scene (Default Background Settings)
 		try:
 			data = json.loads(request.body)
-			new_scene = Scene(name=data['name'], description=data['description'], version="1.0.0", background_scale=1.0)
+			new_scene = Scene(name=data['name'], description=data['description'], background_scale=1.0)
 			new_scene.save()
 			response_data = {
 				"success" : True,
@@ -80,7 +85,7 @@ def scenes(request):
 						"id" : "",
 						"name" : "",
 						"description" : "",
-						"url" : ""
+						"url" : "/static/editor/img/blank-background.jpg"
 					},
 					"background_scale" : new_scene.background_scale,
 					"props" : []
@@ -101,9 +106,14 @@ def scene(request, scene_id):
 			scene_rep = {
 				"id" : scene.id,
 				"name" : scene.name,
-				"version" : scene.version,
+				"version" : scene.version.isoformat(' '),
 				"description" : scene.description,
-				"background" : {},
+				"background" : {
+					"id" : "",
+					"name" : "",
+					"description" : "",
+					"url" : "/static/editor/img/blank-background"
+				},
 				"background_scale" : float(scene.background_scale),
 				"props" : []
 			}
@@ -150,16 +160,11 @@ def scene(request, scene_id):
 				scene.name = update["name"]
 			if update.has_key("description"):
 				scene.description = update["description"]
-			if update.has_key("version"):
-				scene.version = update["version"]
-			scene.save()
 		elif update["type"] == "BACKGROUND":
 			# Background Scale
 			if update.has_key("background_scale") and update["background_scale"] >= 0:
 				scene.background_scale = update["background_scale"]
-			scene.save()
 		elif update["type"] == "PROP":
-			print update
 			# SceneProp attributes
 			try:
 				if update.has_key("scene_prop"):
@@ -181,6 +186,7 @@ def scene(request, scene_id):
 			scene_prop.save()
 		else:
 			return HttpResponse(status=400)
+		scene.save()
 	elif request.method == "DELETE":
 		scene = Scene.objects.get(id=scene_id)
 		# delete all scene_props from the scene
@@ -205,7 +211,7 @@ def scene_resources(request, scene_id):
 			response_data = {}
 			response_data["scene"] = {
 				"name" : scene.name,
-				"version" : scene.version,
+				"version" : scene.version.isoformat(' '),
 				"props" : []
 			}
 			if scene.background is not None:
@@ -243,8 +249,13 @@ def scene_placement(request, scene_id):
 			response_data = {}
 			response_data["scene"] = {
 				"name" : scene.name,
-				"version" : scene.version,
-				"background" : "" ,
+				"version" : scene.version.isoformat(' '),
+				"background" : {
+					"id" : "",
+					"name" : "",
+					"description" : "",
+					"url" : "/static/editor/img/blank-background.jpg"
+				},
 				"props" : []
 			}
 			if scene.background is not None:
@@ -316,6 +327,7 @@ def add_scene_prop(request, scene_id):
 				prop = Prop.objects.get(id=prop_id)
 				new_sceneprop = SceneProp(scene=scene, prop_file=prop)
 				new_sceneprop.save()
+				scene.save()
 				response_data = {
 					"success" : True,
 					"prop" : {
@@ -337,6 +349,23 @@ def add_scene_prop(request, scene_id):
 			return HttpResponse(status=404)
 	else:
 		return HttpResponseNotAllowed('POST')
+
+@csrf_exempt
+def scene_prop(request, scene_prop_id):
+	if request.method == "DELETE":
+		try:
+			scene_prop = SceneProp.objects.get(id=scene_prop_id)
+			scene = scene_prop.scene
+			prop = scene_prop.prop_file
+			print scene.props ## ??
+			scene.props.remove(prop) ## ??
+			scene_prop.delete()
+			scene.save()
+			response_data = { "success" : True }
+			return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+		except ObjectDoesNotExist:
+			return HttpResponse(status=404)
 
 @csrf_exempt
 def backgrounds(request):

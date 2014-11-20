@@ -30,10 +30,10 @@ $(document).ready(function(){
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
 		thumb.src = background.url || "/media/default/question-mark.jpg";
-		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail");
+		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection
-		var thumbRow = $("<div></div>").append(thumb);
+		var thumbRow = $("<div></div>").append(thumb).data("background", background);
 		
 		// Add Thumbnail to Backgrounds
 		$("#backgrounds").append(thumbRow);
@@ -79,16 +79,16 @@ $(document).ready(function(){
 
 	// Set Current Scene's Background in the DOM
 	function renderBackgroundView(background){
-		$("#scene-background-image").attr("src", background.url || "")
+		$("#scene-background-image")
+			.attr("src", background.url || "")
 			.css("display", "block")
 			.attr("draggable", false);
 		var tempBackground = new Image();
 		tempBackground.crossOrigin = "Anonymous";
 		tempBackground.onload = function(){
-			var width = tempBackground.width;
-			var height = tempBackground.height;
-			$("#scene-background-image")[0].width = scene.background_scale * width;
-			$("#scene-background-image")[0].height = scene.background_scale * height;
+			var width = scene.background_scale * tempBackground.width;
+			var height = scene.background_scale * tempBackground.height;
+			$("#scene-background-image").attr("width", width).attr("height", height);
 		}
 		tempBackground.src = background.url || "";
 	}
@@ -103,7 +103,7 @@ $(document).ready(function(){
 			contentType : false,
 			enctype : 'multiplart/form-data',
 			success : function(result){
-				newPropView(result.prop);
+				newPropThumbnail(result.prop);
 			},
 			error : function(error){
 				// BAD
@@ -113,14 +113,14 @@ $(document).ready(function(){
 	}
 
 	// Show that New Prop was Uploaded to Server
-	function newPropView(prop){
+	function newPropThumbnail(prop){
 
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
 		thumb.src = prop.url || "/media/default/question-mark.jpg";
-		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail");
-		var thumbRow = $("<div></div>").append(thumb);
-		$("#props").append(thumbRow);
+		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail").data("prop", prop);
+		var thumbContainer = $("<span></span>").append(thumb).data("prop", prop);
+		$("#props-collection").append(thumbContainer);
 
 		$(thumb).dblclick(function(event){
 			if (!scene.hasOwnProperty("id") || scene.background.url === ""){
@@ -148,25 +148,55 @@ $(document).ready(function(){
 		});
 	}
 
+	// Remove Prop from Current Scene on Server
+	function removeProp(scene_prop_id){
+		$.ajax({
+			type : "DELETE",
+			url : "/api/scenes/props/" + scene_prop_id,
+			success : function(result){
+				if (result.success){
+					
+					// Remove from scene model
+					for (var i in scene.props){
+						if (scene.props[i].scene_prop_id === scene_prop_id){
+							delete scene.props[i];
+							break;
+						}
+					}
+					
+					// remove thumbnail from editor
+					changeEditorMenu();
+
+					// update scene view and thumbnail
+					renderSceneView();
+					changeSceneThumbnail(scene);
+				}
+			},
+			error : function(error){
+				console.log(error.statusText);
+			}
+		})
+	}
+
 	// Add Prop to Current Scene in the DOM
 	function renderPropView(prop){
 		var image = new Image();
 		image.crossOrigin = "Anonymous";
 		image.src = prop.url || "";
-		$(image).data("scene-prop-id", prop.scene_prop_id);
+		$(image).data("scene-prop", prop);
 		image.draggable = true;
 		$(image).addClass("prop");
 
 		// Position
-		image.style.left = prop.position_x ? prop.position_x + "px" : "0px";
-		image.style.top = prop.position_y ? prop.position_y + "px" : "0px";
+		$(image).css({
+			"left" : prop.position_x ? prop.position_x + "px" : "0px", // x
+			"top" : prop.position_y ? prop.position_y + "px" : "0px", // y
+			"z-index" : 4000 - prop.index // z
+		});
 
 		// Scaling
 		image.width *= prop.scale;
 		image.height *= prop.scale;
-
-		// Index
-		image.style.zIndex = 4000 - prop.index;
 
 		$(".scene-props").append(image);
 
@@ -221,7 +251,6 @@ $(document).ready(function(){
 			id : new_scene.id,
 			name : new_scene.name,
 			description : new_scene.description,
-			version : new_scene.version,
 			background : {},
 			background_scale : 1.0,
 			props : {}
@@ -247,8 +276,8 @@ $(document).ready(function(){
 		createSceneThumbnailImage(scene, function(thumb){
 			// Create a New Row in the Background Collection
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
-			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb).data("scene-id", scene.id);
-			$(thumb).data("scene-id", scene.id);
+			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb).data("scene", scene);
+			$(thumb).data("scene", scene);
 			
 			// Add Thumbnail to Backgrounds
 			$("#scenes").append(thumbRow);
@@ -266,7 +295,7 @@ $(document).ready(function(){
 		createSceneThumbnailImage(scene, function(thumb){
 			// Change Thumbnail
 			var sceneThumbnail = $(".scene-thumbnail").filter(function(){
-				return $(this).data("scene-id") === scene.id;
+				return $(this).data("scene").id === scene.id;
 			}).attr("src", thumb.src);
 		});
 	}
@@ -354,7 +383,6 @@ $(document).ready(function(){
 		// Change Metadata
 		$("#editor-scene-name-value").text(scene.name || "");
 		$("#editor-scene-description-value").text(scene.description || "");
-		$("#editor-scene-version-value").text(scene.version || "");
 		scene.id ? $("#edit-scene-btn").removeClass("disabled") : $("#edit-scene-btn").addClass("disabled");
 		scene.id ? $("#delete-scene-btn").removeClass("disabled") : $("#delete-scene-btn").addClass("disabled");
 		
@@ -411,10 +439,6 @@ $(document).ready(function(){
 		if (update.hasOwnProperty("description")){
 			scene.description = update["description"]; // Model
 			$("#editor-scene-description-value").text(update["description"]); // View
-		}
-		if (update.hasOwnProperty("version")){
-			scene.version = update["version"]; // Model
-			$("#editor-scene-version-value").text(update["version"]); // View
 		}
 	}
 
@@ -505,7 +529,7 @@ $(document).ready(function(){
 
 		// Remove From Scenes Tab
 		$(".scene-thumbnail-row").filter(function(){
-			return $(this).data("scene-id") === scene_id;
+			return $(this).data("scene").id === scene.id;
 		}).remove();
 
 		// Update Model
@@ -597,7 +621,7 @@ $(document).ready(function(){
 		if (targ.className != 'prop') {return true;};
 		var propLeft = parseInt(targ.style.left,10);
 		var propTop = parseInt(targ.style.top,10);
-		var scenePropId = $(targ).data("scene-prop-id");
+		var scenePropId = $(targ).data("scene-prop").scene_prop_id;
 		var update_data = {
 			update : {
 				type : "PROP",
@@ -681,7 +705,6 @@ $(document).ready(function(){
 	$("#metadata-modal").on("show.bs.modal", function(event){
 		$("#edit-metadata-name").val(scene.name);
 		$("#edit-metadata-description").val(scene.description);
-		$("#edit-metadata-version").val(scene.version);
 	});
 
 	$("#background-modal").on("show.bs.modal", function(event){
@@ -692,6 +715,7 @@ $(document).ready(function(){
 		var element = event.relatedTarget;
 		var prop = $(element).data("prop");
 		$("#update-prop-btn").data("prop", prop);
+		$("#remove-prop-btn").data("prop", prop);
 		// Load Modal Based on Prop
 		$("#edit-prop-scale").val(prop.scale);
 		$("#edit-prop-index").val(prop.index);
@@ -703,8 +727,7 @@ $(document).ready(function(){
 			"update" : {
 				"type" : "META",
 				"name" : $("#edit-metadata-name").val(),
-				"description" : $("#edit-metadata-description").val(),
-				"version" : $("#edit-metadata-version").val()
+				"description" : $("#edit-metadata-description").val()
 			}
 		}
 		updateMetadata(data);
@@ -732,6 +755,11 @@ $(document).ready(function(){
 			}
 		}
 		updateSceneProp(data);
+	});
+
+	$("#remove-prop-btn").click(function(event){
+		var prop = $(this).data("prop");
+		removeProp(prop.scene_prop_id || "");
 	});
 
 	$("#delete-scene-btn-action").click(function(event){
@@ -835,7 +863,7 @@ $(document).ready(function(){
 			var props = result.props;
 			for (var i in props){
 				var prop = props[i];
-				newPropView(prop);
+				newPropThumbnail(prop);
 			}
 		}
 	});

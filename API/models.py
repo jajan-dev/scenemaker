@@ -6,7 +6,10 @@ class Scene(models.Model):
 	## Metadata
 	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=500, blank=True)
-	version = models.CharField(max_length=16, default="1.0.0")
+	version = models.DateTimeField(auto_now=True)
+
+	## Thumbnail
+	thumbnail = models.ImageField(upload_to='scene-thumbnails/')
 	
 	## Background
 	background = models.ForeignKey('Background', related_name='scenes', related_query_name='scenes', blank=True, null=True)

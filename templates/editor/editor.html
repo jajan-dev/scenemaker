@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="/static/bootstrap/jasny-bootstrap/css/jasny-bootstrap.min.css">
     <script src="/static/bootstrap/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
 
+    <script src="/static/bootstrap/context-menu.js"></script>
+
     <link rel="stylesheet" href="/static/editor/css/editor.css"></link>
     <script src="/static/editor/js/editor.js"></script>
 </head>
@@ -93,6 +95,7 @@
                                 <span class="fileinput-filename"></span>
                                 <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
                             </div>
+                            <div id="props-collection"></div>
                         </div>
                         <div role="tabpanel" class="tab-pane fade text-center" id="editor" aria-labelledby="editor-tab">
                             <div class="tab-title">
@@ -102,7 +105,6 @@
                                 <h2>Scene</h2>
                                 <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
                                 <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
-                                <div id="editor-scene-version">Version: <span id="editor-scene-version-value"></span></div>
                                 <div id="edit-scene-btn" class="btn btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
                                 <div id="delete-scene-btn" class="btn btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
                             </div>
@@ -194,15 +196,11 @@
                             <label for="edit-metadata-description">Description: </label>
                             <input class="form-control" id="edit-metadata-description">
                         </div>
-                        <div class="form-group">
-                            <label for="edit-metadata-version">Version: </label>
-                            <input class="form-control" id="edit-metadata-version">
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-metadata-btn">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -248,8 +246,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-background-btn">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -278,12 +276,24 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-prop-btn">Update</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal" id="remove-prop-btn">Remove</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Context Menus -->
+
+    <!-- Scene Context Menu -->
+    <ul id="scene-context-menu" class="dropdown-menu" role="menu" style="display:none" >
+        <li><a tabindex="-1">Action</a></li>
+        <li><a tabindex="-1">Another action</a></li>
+        <li><a tabindex="-1">Something else here</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1">Separated link</a></li>
+    </ul>
 
 </body>
 </html>
