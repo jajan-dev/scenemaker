@@ -2,18 +2,59 @@
 	display: none;
 }
 
-#navbar-container {
+.above-scene {
 	z-index: 5000;
 }
 
-.main-content {
-	position: relative;
+#main-content {
+	position: absolute;
 	top: 50px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
 }
 
-.sidebar {
-	position: fixed;
-	top: 51px;
+#scene {
+	margin: auto;
+	margin-top: 4px;
+	margin-bottom: 4px;
+	border: 2px solid #ddd;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.075);
+	box-shadow: 0 1px 2px rgba(0,0,0,.075);
+}
+
+#scene-row {
+	position: absolute;
+	top: 0px;
+	width: 100%;
+	bottom: 300px;
+}
+
+#scene-container {
+	margin-left : 400px;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	position: absolute;
+	padding: 0px;
+}
+
+#collections {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	height: 300px;
+	max-height: 50%;
+	min-height: 250px;
+	background-color: #f5f5f5;
+	border-top: 2px solid #ddd;
+}
+
+#sidebar {
+	position: absolute;
+	top: 1px;
 	bottom: 0;
 	left: 0;
 	z-index: 5000;
@@ -23,27 +64,16 @@
 	overflow-y: auto;
 	background-color: #f5f5f5;
 	border-right: 1px solid #eee;
-	min-width: 400px;
-}
-
-.scene-wrapper {
-	position: absolute;
+	width: 400px;
+	text-align: center;
 }
 
 .prop {
 	position : absolute;
 }
 
-.scene-background {
-	position: absolute;
-}
-
 #scene-background-image {
 	z-index: -1;
-}
-
-.scene-props {
-	position : absolute;
 }
 
 .img-thumbnail {
@@ -61,4 +91,14 @@
 
 .modal {
 	z-index: 6000;
+}
+
+.new-btn {
+	margin-top: 5px;
+	height : 100%;
+}
+
+.image-collection {
+	height: 180px;
+	overflow-y: scroll;
 }

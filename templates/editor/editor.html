@@ -10,10 +10,10 @@
     <title>SceneMaker</title>
 
     <!-- External Resources -->
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap/css/bootstrap-theme.min.css">
+    <script src="/static/bootstrap/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -30,7 +30,7 @@
     <script src="/static/editor/js/editor.js"></script>
 </head>
 <body>
-    <nav id="navbar-container" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <nav id="navbar-container" class="navbar navbar-inverse navbar-fixed-top above-scene" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -50,84 +50,72 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid main-content">
-        <div class="row">
-            <div class="col-sm-4 col-md-3 sidebar">
-                <div class="container-fluid">
-                    <ul class="nav nav-tabs menu-tabs nav-justified" role="tablist">
-                        <li role="presentation" class="active full-tab"><a href="#scenes" id="scenes-tab" role="tab" data-toggle="tab" aria-controls="scenes" aria-expanded="true">Scenes</a></li>
-                        <li role="presentation" class="full-tab"><a href="#backgrounds" id="backgrounds-tab" role="tab" data-toggle="tab" aria-controls="backgrounds" aria-expanded="true">Backgrounds</a></li>
-                        <li role="presentation" class="full-tab"><a href="#props" id="props-tab" role="tab" data-toggle="tab" aria-controls="props" aria-expanded="true">Props</a></li>
-                        <li role="presentation" class="full-tab"><a href="#editor" id="editor-tab" role="tab" data-toggle="tab" aria-controls="editor" aria-expanded="true">Editor</a></li>
-                    </ul>
-
-                    <div id="menu-tab-content" class="tab-content">
-                        <div role="tabpanel" class="tab-pane fade active in text-center" id="scenes" aria-labelledby="scenes-tab">
-                            <div class="tab-title"><h1>Scenes<h1></div>
-                            <div>
-                                <span type="button" id="new-scene-prompter" class="btn btn-primary" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade text-center" id="backgrounds" aria-labelledby="backgrounds-tab">
-                            <div class="tab-title"><h1>Backgrounds<h1></div>
-                            <div class="image-collection background-collection">
-                            </div>
-                            <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
-                                <span class="btn btn-default btn-file">
-                                    <span class="fileinput-new">Upload background</span>
-                                    <span class="fileinput-exists">Change</span>
-                                    <input id="new-background" type="file" name="..." accept="image/*">
-                                </span>
-                                <span class="fileinput-filename"></span>
-                                <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade text-center" id="props" aria-labelledby="props-tab">
-                            <div class="tab-title"><h1>Props<h1></div>
-                            <div class="image-collection prop-collection">
-                            </div>
-                            <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
-                                <span class="btn btn-default btn-file">
-                                    <span class="fileinput-new">Upload prop</span>
-                                    <span class="fileinput-exists">Change</span>
-                                    <input id="new-prop" type="file" name="..." accept="image/*">
-                                </span>
-                                <span class="fileinput-filename"></span>
-                                <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
-                            </div>
-                            <div id="props-collection"></div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade text-center" id="editor" aria-labelledby="editor-tab">
-                            <div class="tab-title">
-                                <h1>Editor</h1>
-                            </div>
-                            <div class="tab-section">
-                                <h2>Scene</h2>
-                                <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
-                                <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
-                                <div id="edit-scene-btn" class="btn btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
-                                <div id="delete-scene-btn" class="btn btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
-                            </div>
-                            <div class="tab-section">
-                                <h2>Background</h2>
-                                <div id="editor-background">
-                                    <img class="img-thumbnail background-thumbnail">
-                                </div>
-                            </div>
-                            <div class="tab-section">
-                                <h2>Props</h2>
-                                <div id="editor-props"></div>
-                            </div>
-                        </div>
+    <div id="main-content" class="container-fluid">
+        <div class="row" id="scene-row">
+            <div id="sidebar" class="above-scene container-fluid">
+                <div class="tab-title">
+                    <h1>Editor</h1>
+                </div>
+                <div class="sidebar-row">
+                    <h2 class="sidebar-row-title">Scene</h2>
+                    <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
+                    <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
+                    <div id="edit-scene-btn" class="btn btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
+                    <div id="delete-scene-btn" class="btn btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
+                </div>
+                <div class="sidebar-row">
+                    <h2 class="sidebar-row-title">Background</h2>
+                    <div id="editor-background">
+                        <img class="img-thumbnail background-thumbnail">
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-8 colmd-offset-4 col-md-9 col-md-offset-3 scene-wrapper">
-                <div class="scene-background scene">
-                    <img id="scene-background-image">
+                <div class="sidebar-row">
+                    <h2 class="sidebar-row-title">Props</h2>
+                    <div id="editor-props"></div>
                 </div>
-                <div class="scene-props scene">
-
+            </div>
+            <div id="scene-container">
+                <div id="scene">
+                    <!-- <div class="aspect-element" id="scene"> -->
+                        <img id="scene-background-image">
+                    <!-- </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="row above-scene container-fluid" id="collections">
+            <ul class="nav nav-tabs menu-tabs nav-justified" role="tablist">
+                <li role="presentation" class="active full-tab"><a href="#scenes" id="scenes-tab" role="tab" data-toggle="tab" aria-controls="scenes" aria-expanded="true">Scenes</a></li>
+                <li role="presentation" class="full-tab"><a href="#backgrounds" id="backgrounds-tab" role="tab" data-toggle="tab" aria-controls="backgrounds" aria-expanded="true">Backgrounds</a></li>
+                <li role="presentation" class="full-tab"><a href="#props" id="props-tab" role="tab" data-toggle="tab" aria-controls="props" aria-expanded="true">Props</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade active in text-center" id="scenes" aria-labelledby="scenes-tab">
+                    <div class="new-scene-row">
+                        <span type="button" id="new-scene-prompter" class="btn btn-success btn-lg new-btn" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
+                    </div>
+                    <div class="image-collection" id="scene-collection">
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade text-center" id="backgrounds" aria-labelledby="backgrounds-tab">
+                    <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
+                        <span class="btn btn-file btn-success btn-lg new-btn">
+                            <span class="fileinput-new">Upload background</span>
+                            <input id="new-background" type="file" name="..." accept="image/*">
+                        </span>
+                        <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+                    </div>
+                    <div class="image-collection" id="background-collection">
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade text-center" id="props" aria-labelledby="props-tab">
+                    <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
+                        <span class="btn btn-file btn-success btn-lg new-btn">
+                            <span class="fileinput-new">Upload prop</span>
+                            <input id="new-prop" type="file" name="..." accept="image/*">
+                        </span>
+                        <a href="#" class="close fileinput-exists" data-dismiss="fileinput" style="float: none">&times;</a>
+                    </div>
+                    <div id="props-collection" class="image-collection prop-collection"></div>
                 </div>
             </div>
         </div>

@@ -3,6 +3,9 @@ $(document).ready(function(){
 	// Current Scene loaded in the Client Browser
 	scene = {};
 
+	// Viewport Adjusted Scale - Default to 1.0
+	var adjustedScale = 1.0;
+
 	// Save New Background to Server
 	function newBackground(formData){
 		$.ajax({
@@ -14,7 +17,7 @@ $(document).ready(function(){
 			enctype : 'multiplart/form-data',
 			success : function(result){
 				// Show that New Background Was Uploaded to Server
-				newBackgroundView(result.background)
+				newBackgroundThumbnail(result.background)
 			},
 			error : function(error){
 				// BAD
@@ -24,7 +27,7 @@ $(document).ready(function(){
 	}
 
 	// Show that New Background Was Uploaded to Server
-	function newBackgroundView(background){
+	function newBackgroundThumbnail(background){
 
 		// Create a Thumbnail
 		var thumb = new Image();
@@ -33,10 +36,10 @@ $(document).ready(function(){
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection
-		var thumbRow = $("<div></div>").append(thumb).data("background", background);
+		var thumbRow = $("<span></span>").append(thumb).data("background", background);
 		
 		// Add Thumbnail to Backgrounds
-		$("#backgrounds").append(thumbRow);
+		$("#background-collection").append(thumbRow);
 
 		// Event Listener for Background Thumbnail - Selection / Set
 		$(thumb).dblclick(function(event){
@@ -79,6 +82,7 @@ $(document).ready(function(){
 
 	// Set Current Scene's Background in the DOM
 	function renderBackgroundView(background){
+
 		$("#scene-background-image")
 			.attr("src", background.url || "")
 			.css("display", "block")
@@ -86,9 +90,11 @@ $(document).ready(function(){
 		var tempBackground = new Image();
 		tempBackground.crossOrigin = "Anonymous";
 		tempBackground.onload = function(){
-			var width = scene.background_scale * tempBackground.width;
-			var height = scene.background_scale * tempBackground.height;
-			$("#scene-background-image").attr("width", width).attr("height", height);
+			scene.background.originalWidth = tempBackground.width;
+			scene.background.originalHeight = tempBackground.height;
+			var width = scene.background_scale * scene.background.originalWidth * adjustedScale;
+			var height = scene.background_scale * scene.background.originalHeight * adjustedScale;
+			$("#scene-background-image").width(width).height(height);
 		}
 		tempBackground.src = background.url || "";
 	}
@@ -180,27 +186,41 @@ $(document).ready(function(){
 
 	// Add Prop to Current Scene in the DOM
 	function renderPropView(prop){
+		if (!prop){
+			return false;
+		}
 		var image = new Image();
 		image.crossOrigin = "Anonymous";
+		image.onload = function(){
+			$(image).data("scene-prop", prop);
+			image.draggable = true;
+			$(image).addClass("prop");
+
+			prop.originalWidth = image.width;
+			prop.originalHeight = image.height;
+
+			var offset = $("#scene-background-image").offset();
+			var left = Math.floor((prop.position_x || 0) * adjustedScale + offset.left);
+			var top = Math.floor((prop.position_y || 0) * adjustedScale + offset.top);
+
+			// Scaling
+			image.width = prop.originalWidth * prop.scale * adjustedScale;
+			image.height = prop.originalHeight * prop.scale * adjustedScale;
+
+			$("#scene").append(image);
+
+			// Position
+			$(image).offset({
+				left : left,
+				top : top
+			});
+			$(image).css({
+				"z-index" : 4000 - prop.index // z
+			});
+
+			changeEditorMenu();
+		}
 		image.src = prop.url || "";
-		$(image).data("scene-prop", prop);
-		image.draggable = true;
-		$(image).addClass("prop");
-
-		// Position
-		$(image).css({
-			"left" : prop.position_x ? prop.position_x + "px" : "0px", // x
-			"top" : prop.position_y ? prop.position_y + "px" : "0px", // y
-			"z-index" : 4000 - prop.index // z
-		});
-
-		// Scaling
-		image.width *= prop.scale;
-		image.height *= prop.scale;
-
-		$(".scene-props").append(image);
-
-		changeEditorMenu();
 	}
 
 	// Update Prop Position on Server
@@ -276,11 +296,11 @@ $(document).ready(function(){
 		createSceneThumbnailImage(scene, function(thumb){
 			// Create a New Row in the Background Collection
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
-			var thumbRow = $("<div></div>").addClass("scene-thumbnail-row").append(thumb).data("scene", scene);
+			var thumbElement = $("<span></span>").addClass("scene-thumbnail-element").append(thumb).data("scene", scene);
 			$(thumb).data("scene", scene);
 			
 			// Add Thumbnail to Backgrounds
-			$("#scenes").append(thumbRow);
+			$("#scene-collection").append(thumbElement);
 
 			// Event Listener for Background Thumbnail - Selection / Set
 			$(thumb).dblclick(function(event){
@@ -371,7 +391,7 @@ $(document).ready(function(){
 		$("#scene-background-image")[0].width = 0;
 		$("#scene-background-image")[0].height = 0;
 		$("#scene-background-image").attr("src", null);
-		$(".scene-props").html("");
+		$(".prop").remove()
 		return true;
 	}
 
@@ -548,12 +568,71 @@ $(document).ready(function(){
 		document.onmouseup = stopDrag;
 	}
 
+	function adjustSceneDimension(){
+		var newWidth = $("#scene-container").width() - 10;
+		var newHeight = $("#scene-container").height() - 10;
+		var ratio = newWidth / newHeight;
+		var desiredRatio = 16/9;
+		var adjustedWidth = newWidth;
+		var adjustedHeight = newHeight;
+		if (ratio < desiredRatio){
+			// Too Tall
+			adjustedHeight = newWidth / desiredRatio;
+			adjustedWidth = newWidth;
+		}
+		else if (ratio > desiredRatio){
+			// Too Wide
+			adjustedWidth = newHeight * desiredRatio;
+			adjustedHeight = newHeight;
+		}
+
+		// Set Adjusting Scale
+		adjustedScale = adjustedWidth / 1920;
+
+		// Adjust Scene Div
+		$("#scene").width(adjustedWidth).height(adjustedHeight);
+		var newBottom = $("#collections").height();
+		$("#scene-row").css({ "bottom" : newBottom });
+		
+		// Adjust Scene Background Image
+		var originalWidth, originalHeight;
+		if (scene.background){
+			originalWidth = scene.background.originalWidth || 0;
+			originalHeight = scene.background.originalHeight || 0;
+		}
+		var backgroundWidth = scene.background_scale * originalWidth * adjustedScale;
+		var backgroundHeight = scene.background_scale * originalHeight * adjustedScale;
+		$("#scene-background-image").width(backgroundWidth).height(backgroundHeight);
+
+		// Adjust Scene Prop Images
+		var offset = $("#scene-background-image").offset();
+		for (var i in scene.props || []){
+			var originalWidth, originalHeight;
+			var prop = scene.props[i];
+			originalWidth = prop.originalWidth || 0;
+			originalHeight = prop.originalHeight || 0;
+			var propWidth = (prop.scale || 1) * originalWidth * adjustedScale;
+			var propHeight = (prop.scale || 1) * originalHeight * adjustedScale;
+			var left = Math.floor((prop.position_x || 0) * adjustedScale + offset.left);
+			var top = Math.floor((prop.position_y || 0) * adjustedScale + offset.top);
+			$(".prop").filter(function(){
+				return $(this).data("scene-prop").scene_prop_id === prop.scene_prop_id;
+			}).width(propWidth).height(propHeight).offset({ left : left, top : top });
+
+		}
+	}
+
+	// Dynamic Scene View Adjuster
+	$(window).resize(function(e){
+		adjustSceneDimension();
+	});
+
 	// Drag Event Listener Helpers
 
 	// Drag Event Variables
 	var drag = false;
-	var targ, coordX, coordY, offsetX, offsetY;
-	var left, top, maxLeft, maxTop;
+	var targ, startX, startY, startLeft, startTop;
+	var left, top;
 
 	// Start Drag Event Hanlder
 	function startDrag(e) {
@@ -567,9 +646,6 @@ $(document).ready(function(){
 		targ = e.target ? e.target : e.srcElement;
 
 		if (targ.className != 'prop') {return true;};
-		// calculate event X, Y coordinates
-		offsetX = e.clientX;
-		offsetY = e.clientY;
 
 		// assign default values for top and left properties
 		if (!targ.style.left) { targ.style.left='0px'};
@@ -577,9 +653,14 @@ $(document).ready(function(){
 
 		// calculate integer values for top and left 
 		// properties
-		coordX = parseInt(targ.style.left);
-		coordY = parseInt(targ.style.top);
+		startX = e.clientX;
+		startY = e.clientY;
 		drag = true;
+
+		// Where image was clicked
+		var offset = $(targ).offset();
+		startLeft = offset.left;
+		startTop = offset.top;
 
 		// move div element
 		document.onmousemove = dragDiv;
@@ -590,26 +671,35 @@ $(document).ready(function(){
 	function dragDiv(e) {
 		if (!drag) { return; }
 		if (!e) { var e = window.event; }
-		// var targ=e.target?e.target:e.srcElement;
+		// var targ = e.target ? e.target : e.srcElement;
 		// move div element
-		left = coordX + e.clientX - offsetX;
-		maxLeft = ($("#scene-background-image")[0].width || 1920) - targ.width;
-		top = coordY + e.clientY - offsetY;
-		maxTop = ($("#scene-background-image")[0].height || 1080) - targ.height;
-		if (left < 0){
-			targ.style.left = '0px';
+		var dx = e.clientX - startX;
+		var dy = e.clientY - startY;
+		left = startLeft + dx;
+		top = startTop + dy;
+
+		var sceneOffset = $("#scene-background-image").offset();
+		var minLeft = sceneOffset.left;
+		var maxLeft = 1920*adjustedScale - targ.width + sceneOffset.left;
+		var minTop = sceneOffset.top;
+		var maxTop = 1080*adjustedScale - targ.height + sceneOffset.top;
+
+		if (left < minLeft){
+			$(targ).offset({ left : minLeft });
 		} else if (left > maxLeft){
-			targ.style.left = maxLeft + 'px'
+			$(targ).offset({ left : maxLeft });
 		} else {
-			targ.style.left = left + 'px';
+			$(targ).offset({ left : left });
 		}
-		if (top < 0){
-			targ.style.top = '0px';
+
+		if (top < minTop){
+			$(targ).offset({ top : minTop });
 		} else if (top > maxTop){
-			targ.style.top = maxTop + 'px';
+			$(targ).offset({ top : maxTop });
 		} else {
-			targ.style.top = top + 'px';
+			$(targ).offset({ top : top });
 		}
+
 		return false;
 	}
 
@@ -619,8 +709,11 @@ $(document).ready(function(){
 
 		if (!e) {  var e = window.event; }
 		if (targ.className != 'prop') {return true;};
-		var propLeft = parseInt(targ.style.left,10);
-		var propTop = parseInt(targ.style.top,10);
+
+		var propOffset = $(targ).offset();
+		var sceneOffset = $("#scene-background-image").offset();
+		var propLeft = parseInt((propOffset.left - sceneOffset.left)/adjustedScale, 10);
+		var propTop = parseInt((propOffset.top - sceneOffset.top)/adjustedScale, 10);
 		var scenePropId = $(targ).data("scene-prop").scene_prop_id;
 		var update_data = {
 			update : {
@@ -659,7 +752,6 @@ $(document).ready(function(){
 
 		// Reset Upload Tool (Blank)
 		$("#new-background").replaceWith($("#new-background").val('').clone(true));
-		$(".fileinput-filename").html("");
 		
 		// Create New Form with Background Image
 		var data = new FormData();
@@ -688,7 +780,6 @@ $(document).ready(function(){
 
 		// Reset Upload Tool (Blank)
 		$("#new-prop").replaceWith($("#new-prop").val('').clone(true));
-		$(".fileinput-filename").html("");
 
 		// Create New Form with Prop Image
 		var data = new FormData();
@@ -852,7 +943,7 @@ $(document).ready(function(){
 			var backgrounds = result.backgrounds;
 			for (var i in backgrounds){
 				var background = backgrounds[i];
-				newBackgroundView(background);
+				newBackgroundThumbnail(background);
 			}
 		}
 	});
@@ -869,4 +960,6 @@ $(document).ready(function(){
 			}
 		}
 	});
+
+	adjustSceneDimension();
 });
