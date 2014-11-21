@@ -569,8 +569,8 @@ $(document).ready(function(){
 	}
 
 	function adjustSceneDimension(){
-		var newWidth = $("#scene-container").width() - 10;
-		var newHeight = $("#scene-container").height() - 10;
+		var newWidth = $("#scene-container").width() - 12;
+		var newHeight = $("#scene-container").height() - 12;
 		var ratio = newWidth / newHeight;
 		var desiredRatio = 16/9;
 		var adjustedWidth = newWidth;
