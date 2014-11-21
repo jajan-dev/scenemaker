@@ -192,7 +192,9 @@ def scene(request, scene_id):
 		# delete all scene_props from the scene
 		scene_props = SceneProp.objects.filter(scene=scene)
 		for scene_prop in scene_props:
+			scene = scene_prop.scene
 			scene_prop.delete()
+			scene.save()
 		# delete scene
 		scene.delete()
 		response_data = { "success" : True }
@@ -356,9 +358,6 @@ def scene_prop(request, scene_prop_id):
 		try:
 			scene_prop = SceneProp.objects.get(id=scene_prop_id)
 			scene = scene_prop.scene
-			prop = scene_prop.prop_file
-			print scene.props ## ??
-			scene.props.remove(prop) ## ??
 			scene_prop.delete()
 			scene.save()
 			response_data = { "success" : True }
@@ -366,6 +365,8 @@ def scene_prop(request, scene_prop_id):
 
 		except ObjectDoesNotExist:
 			return HttpResponse(status=404)
+	else:
+		return HttpResponseNotAllowed('DELETE')
 
 @csrf_exempt
 def backgrounds(request):
@@ -508,9 +509,9 @@ def prop(request, prop_id):
 		# Unset From all scenes and delete scene_prop
 		scene_props = SceneProp.objects.filter(prop_file=prop)
 		for scene_prop in scene_props:
-			scene = Scene.objects.get(id=scene_prop.scene)
-			scene.props.remove(prop)
+			scene = scene_prop.scene
 			scene_prop.delete()
+			scene.save()
 		# Delete File
 		if prop.image:
 			if not settings.USE_AWS and prop.image.path:
