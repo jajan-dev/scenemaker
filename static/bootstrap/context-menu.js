@@ -74,3 +74,11 @@
 // });
 // Invoked - Clicked Location w/ .contextMenu jQuery
 // SelectedMenu - Item selected on the context menu
+
+// <ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >
+//     <li><a tabindex="-1" href="#">Action</a></li>
+//     <li><a tabindex="-1" href="#">Another action</a></li>
+//     <li><a tabindex="-1" href="#">Something else here</a></li>
+//     <li class="divider"></li>
+//     <li><a tabindex="-1" href="#">Separated link</a></li>
+// </ul>

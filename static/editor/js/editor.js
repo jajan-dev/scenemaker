@@ -324,8 +324,11 @@ $(document).ready(function(){
 		
 		// Create Temporary Canvas
 		var canvas = $("<canvas></canvas>")[0];
-		canvas.width = 1920;
-		canvas.height = 1080;
+		var width = 128;
+		var height = 72;
+		canvas.width = width;
+		canvas.height = height;
+		var thumbScale = height / 1080;
 		var ctx = canvas.getContext('2d');
 
 		// Create a Thumbnail
@@ -336,8 +339,8 @@ $(document).ready(function(){
 		var backgroundImage = new Image();
 		backgroundImage.crossOrigin = "Anonymous";
 		backgroundImage.onload = function(){
-			backgroundImage.width *= scene.background_scale;
-			backgroundImage.height *= scene.background_scale;
+			backgroundImage.width *= scene.background_scale * thumbScale;
+			backgroundImage.height *= scene.background_scale * thumbScale;
 			ctx.drawImage(this, 0, 0, backgroundImage.width, backgroundImage.height);
 			multiplePropThumbnailLoader(scene.props, propsLoaded);
 		}
@@ -347,10 +350,10 @@ $(document).ready(function(){
 			for (var i in propImages){
 				var prop = propImages[i].prop;
 				var image = propImages[i].image;
-				var left = prop["position_x"];
-				var top = prop["position_y"];
-				image.width *= prop["scale"];
-				image.height *= prop["scale"];
+				var left = prop["position_x"] * thumbScale;
+				var top = prop["position_y"] * thumbScale;
+				image.width *= prop["scale"] * thumbScale;
+				image.height *= prop["scale"] * thumbScale;
 				ctx.drawImage(image, left, top, image.width, image.height);
 			}
 			var imageDataURL = canvas.toDataURL();

@@ -53,15 +53,12 @@
     <div id="main-content" class="container-fluid">
         <div class="row" id="scene-row">
             <div id="sidebar" class="above-scene container-fluid">
-                <div class="tab-title">
-                    <h1>Editor</h1>
-                </div>
                 <div class="sidebar-row">
                     <h2 class="sidebar-row-title">Scene</h2>
                     <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
                     <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
-                    <div id="edit-scene-btn" class="btn btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
-                    <div id="delete-scene-btn" class="btn btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
+                    <div id="edit-scene-btn" class="btn btn-sm btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
+                    <div id="delete-scene-btn" class="btn btn-sm btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
                 </div>
                 <hr>
                 <div class="sidebar-row">
@@ -93,14 +90,14 @@
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade active in text-center" id="scenes" aria-labelledby="scenes-tab">
                     <div class="new-scene-row">
-                        <span type="button" id="new-scene-prompter" class="btn btn-success btn-lg new-btn" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
+                        <span type="button" id="new-scene-prompter" class="btn btn-success btn-sm new-btn" data-toggle="modal" data-target="#new-scene-modal">New Scene</span>
                     </div>
                     <div class="image-collection" id="scene-collection">
                     </div>
                 </div>
                 <div role="tabpanel" class="tab-pane fade text-center" id="backgrounds" aria-labelledby="backgrounds-tab">
                     <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
-                        <span class="btn btn-file btn-success btn-lg new-btn">
+                        <span class="btn btn-file btn-success btn-sm new-btn">
                             <span class="fileinput-new">Upload background</span>
                             <input id="new-background" type="file" name="..." accept="image/*">
                         </span>
@@ -111,7 +108,7 @@
                 </div>
                 <div role="tabpanel" class="tab-pane fade text-center" id="props" aria-labelledby="props-tab">
                     <div class="fileinput fileinput-new scenemaker-fileinput" data-provides="fileinput">
-                        <span class="btn btn-file btn-success btn-lg new-btn">
+                        <span class="btn btn-file btn-success btn-sm new-btn">
                             <span class="fileinput-new">Upload prop</span>
                             <input id="new-prop" type="file" name="..." accept="image/*">
                         </span>
@@ -284,6 +281,9 @@
         <li class="divider"></li>
         <li><a tabindex="-1">Separated link</a></li>
     </ul>
+
+    <!-- Background Context Menu -->
+
 
 </body>
 </html>
