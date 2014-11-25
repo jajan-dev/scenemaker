@@ -10,7 +10,7 @@ $(document).ready(function(){
 	var adjustedScale = 1.0;
 
 	// Save New Background to Server
-	function newBackground(formData){
+	function newBackground(formData, addToScene){
 		$.ajax({
 			type : "POST",
 			url : "/api/backgrounds/",
@@ -20,7 +20,11 @@ $(document).ready(function(){
 			enctype : 'multiplart/form-data',
 			success : function(result){
 				// Show that New Background Was Uploaded to Server
-				newBackgroundThumbnail(result.background)
+				newBackgroundThumbnail(result.background);
+				if (scene.hasOwnProperty("id") && addToScene){
+					// Set Current Scene Background using Background Data Model Representation
+					setBackground(result.background);
+				}
 			},
 			error : function(error){
 				// BAD
@@ -104,7 +108,7 @@ $(document).ready(function(){
 	}
 
 	// Save New Prop to Server
-	function newProp(formData){
+	function newProp(formData, addToScene){
 		$.ajax({
 			type : "POST",
 			url : "/api/props/",
@@ -114,6 +118,10 @@ $(document).ready(function(){
 			enctype : 'multiplart/form-data',
 			success : function(result){
 				newPropThumbnail(result.prop);
+				if (scene.hasOwnProperty("id") && addToScene){
+					// Add prop to scene
+					addProp(result.prop);
+				}
 			},
 			error : function(error){
 				// BAD
@@ -417,11 +425,12 @@ $(document).ready(function(){
 		$("#editor-scene-description-value").text(scene.description || "");
 		scene.id ? $("#edit-scene-btn").removeClass("disabled") : $("#edit-scene-btn").addClass("disabled");
 		scene.id ? $("#delete-scene-btn").removeClass("disabled") : $("#delete-scene-btn").addClass("disabled");
+		scene.id ? $(".new-asset-btn-group").removeClass("disabled") : $(".new-asset-btn-group").addClass("disabled");
+		$("#add-background-label").text(scene.id ? "Change Background" : "Add Background");
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
 			.attr("src", (scene.background && scene.background.url) || "/static/editor/img/blank-background.jpg")
-			.removeClass("disabled")
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
 			.click(function(event){
@@ -444,7 +453,6 @@ $(document).ready(function(){
 				.attr("data-toggle", "modal")
 				.attr("data-target", "#prop-modal")
 				.data("prop", prop)
-				.removeClass("disabled");
 			$("#editor-props").append(propImage);
 		});
 	}
@@ -780,7 +788,7 @@ $(document).ready(function(){
 		data.append("description", "BACKGROUND_DESCRIPTION");
 		
 		// Save New Background to Server
-		newBackground(data);
+		newBackground(data, false);
 	});
 
 	// Prop Image Uploaded Event Listener
@@ -807,7 +815,62 @@ $(document).ready(function(){
 		data.append("name", "SCENEPROP_NAME");
 		data.append("description", "SCENEPROP_DESCRIPTION");
 
-		newProp(data);
+		newProp(data, false);
+	});
+
+	// Background Image Uploaded and Add Event Listener
+	$("#upload-add-background").on('change.bs.fileinput', function(){
+
+		// Get File
+		var files = [this.files[0]];
+		var file = files[0];
+
+		// Read File
+		var backgroundFr = new FileReader();
+		backgroundFr.readAsDataURL(file);
+
+		// Reset Upload Tool (Blank)
+		$("#upload-add-background").replaceWith($("#upload-add-background").val('').clone(true));
+		
+		// Create New Form with Background Image
+		var data = new FormData();
+		$.each(files, function(key,value){
+			data.append("background",value);
+		});
+
+		// Background Image Metadata - TODO
+		data.append("name", "BACKGROUND_NAME");
+		data.append("description", "BACKGROUND_DESCRIPTION");
+		
+		// Save New Background to Server
+		newBackground(data, true);
+	});
+
+	// Prop Image Uploaded Event Listener
+	$("#upload-add-prop").on('change.bs.fileinput', function(){
+		
+		// Get File
+		var files = [this.files[0]];
+		var file = files[0];
+
+		// Read File
+		var propFr = new FileReader();
+		propFr.readAsDataURL(file);
+
+		// Reset Upload Tool (Blank)
+		$("#upload-add-prop").replaceWith($("#upload-add-prop").val('').clone(true));
+
+		// Create New Form with Prop Image
+		var data = new FormData();
+		$.each(files, function(key,value){
+			data.append("prop",value);
+		});
+
+		// Prop Image Metadata - TODO
+		data.append("name", "SCENEPROP_NAME");
+		data.append("description", "SCENEPROP_DESCRIPTION");
+
+		newProp(data, true);
 	});
 
 	// Modal Event Listeners
