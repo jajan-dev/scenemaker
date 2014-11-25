@@ -1,5 +1,8 @@
 $(document).ready(function(){
 
+	// TODO - changeSceneThumbnail
+	// TODO - addSceneThumbnail
+
 	// Current Scene loaded in the Client Browser
 	scene = {};
 
@@ -55,6 +58,7 @@ $(document).ready(function(){
 	// Set Current Scene Background using Background Dat Model Representation
 	function setBackground(background){
 		$.ajax({
+			// TODO Scene Thumbnail
 			type : "POST",
 			url : "/api/scenes/" + scene.id + "/background/set",
 			data : JSON.stringify({ background : background.id }),
@@ -140,6 +144,7 @@ $(document).ready(function(){
 	// Add Prop to Current Scene on Server
 	function addProp(prop){
 		$.ajax({
+			// TODO Scene Thumbnail
 			type : "POST",
 			url : "/api/scenes/" + scene.id + "/props/add",
 			data : JSON.stringify({ prop : prop.id }),
@@ -157,6 +162,7 @@ $(document).ready(function(){
 	// Remove Prop from Current Scene on Server
 	function removeProp(scene_prop_id){
 		$.ajax({
+			// TODO Scene Thumbnail
 			type : "DELETE",
 			url : "/api/scenes/props/" + scene_prop_id,
 			success : function(result){
@@ -226,6 +232,7 @@ $(document).ready(function(){
 	// Update Prop Position on Server
 	function moveProp(id, update){
 		$.ajax({
+			// TODO Scene Thumbnail
 			type : "PUT",
 			url : "/api/scenes/" + scene.id,
 			data : JSON.stringify(update),
@@ -244,6 +251,8 @@ $(document).ready(function(){
 	// Save New Scene on Server
 	function newScene(name, description){
 		$.ajax({
+			// TODO Scene Thumbnail
+			// SPECIAL
 			type : "POST",
 			url : "/api/scenes",
 			data : JSON.stringify({
@@ -467,6 +476,8 @@ $(document).ready(function(){
 
 	function updateBackground(data){
 		$.ajax({
+			// TODO Scene Thumbnail
+			// Special
 			type : "PUT",
 			url : "/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
@@ -499,6 +510,8 @@ $(document).ready(function(){
 
 	function updateSceneProp(data){
 		$.ajax({
+			// TODO Scene Thumbnail
+			// Special
 			type : "PUT",
 			url : "/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
