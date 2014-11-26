@@ -399,7 +399,8 @@ def backgrounds(request):
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	elif request.method == "POST":
 		# NEW Background
-		background_model = Background(name=request.POST.get("name"), description=request.POST.get("description"), image=request.FILES["background"])
+		background_model = Background(name=request.POST.get("name"), description=request.POST.get("description"))
+		background_model.image = request.FILES["background"]
 		background_model.save()
 		background_rep = { 
 			"id" : background_model.id, 
@@ -478,8 +479,9 @@ def props(request):
 			response_data["props"].append(obj)
 		return HttpResponse(json.dumps(response_data), content_type="application/json")
 	elif request.method == "POST":
-		# NEW Background
-		prop_model = Prop(name=request.POST.get("name"), description=request.POST.get("description"), image=request.FILES["prop"])
+		# NEW Prop
+		prop_model = Prop(name=request.POST.get("name"), description=request.POST.get("description"))
+		prop_model.image = request.FILES["prop"]
 		prop_model.save()
 		prop_rep = {
 			"id" : prop_model.id, 
