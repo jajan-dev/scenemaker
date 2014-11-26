@@ -95,7 +95,7 @@ if os.environ.has_key('USE_AWS') and os.environ['USE_AWS']:
     AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
     AWS_STORAGE_BUCKET_NAME = 'jajan-scenemaker-assets'
     AWS_QUERYSTRING_AUTH = False
-    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_FILE_OVERWRITE = True
 else:
     USE_AWS = False
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -1,7 +1,6 @@
 $(document).ready(function(){
 
 	// TODO - changeSceneThumbnail
-	// TODO - addSceneThumbnail
 
 	// Current Scene loaded in the Client Browser
 	scene = {};
@@ -43,10 +42,10 @@ $(document).ready(function(){
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection
-		var thumbRow = $("<span></span>").append(thumb).data("background", background);
+		var thumbElement = $("<span></span>").append(thumb).data("background", background);
 		
 		// Add Thumbnail to Backgrounds
-		$("#background-collection").append(thumbRow);
+		$("#background-collection").append(thumbElement);
 
 		// Event Listener for Background Thumbnail - Selection / Set
 		$(thumb).dblclick(function(event){
@@ -331,10 +330,35 @@ $(document).ready(function(){
 
 		createSceneThumbnailImage(scene, function(thumb){
 			// Change Thumbnail
-			var sceneThumbnail = $(".scene-thumbnail").filter(function(){
+			$(".scene-thumbnail").filter(function(){
 				return $(this).data("scene").id === scene.id;
 			}).attr("src", thumb.src);
+			updateSceneModelThumbnail(scene, thumb);
 		});
+	}
+
+	function updateSceneModelThumbnail(scene, thumb){
+		$.ajax({
+			type : "PUT",
+			url : "/api/scenes/" + scene.id,
+			data : JSON.stringify({
+				"update" : {
+					"type" : "SCENE",
+					"thumbnail" : thumb.src.split(',')[1]
+				}
+			}),
+			success : function(result){
+				if (!result.success){
+					console.log("Unable to save scene thumbnail");
+				}
+				else {
+					console.log(thumb.src.split(',')[1]);
+				}
+			},
+			error : function(error){
+				console.log(error);
+			}
+		})
 	}
 
 	function createSceneThumbnailImage(scene, callback){
@@ -408,8 +432,8 @@ $(document).ready(function(){
 
 	// Resets Scene to Empty View
 	function clearSceneView(){
-		$("#scene-background-image")[0].width = 0;
-		$("#scene-background-image")[0].height = 0;
+		$("#scene-background-image").width(0);
+		$("#scene-background-image").height(0);
 		$("#scene-background-image").attr("src", null);
 		$(".prop").remove()
 		return true;
@@ -555,7 +579,6 @@ $(document).ready(function(){
 			type : "DELETE",
 			url : "/api/scenes/" + scene.id,
 			success : function(result){
-				console.log(result);
 				if (result.success){
 					deleteSceneView(scene.id);
 				}
@@ -563,7 +586,7 @@ $(document).ready(function(){
 			error : function(error){
 				console.log(error.statusText);
 			}
-		})
+		});
 	}
 
 	function deleteSceneView(scene_id){
@@ -572,8 +595,8 @@ $(document).ready(function(){
 		clearSceneView();
 
 		// Remove From Scenes Tab
-		$(".scene-thumbnail-row").filter(function(){
-			return $(this).data("scene").id === scene.id;
+		$(".scene-thumbnail-element").filter(function(){
+			return $(this).data("scene").id === scene_id;
 		}).remove();
 
 		// Update Model
@@ -755,9 +778,7 @@ $(document).ready(function(){
 		
 		// Get Metadata
 		var name = $("#new-scene-name").val();
-		var description = $("#new-scene-description").val()
-
-		console.log(name,description);
+		var description = $("#new-scene-description").val();
 		
 		// Create New Scene on Server
 		newScene(name, description);
@@ -780,6 +801,7 @@ $(document).ready(function(){
 		// Create New Form with Background Image
 		var data = new FormData();
 		$.each(files, function(key,value){
+			console.log(value);
 			data.append("background",value);
 		});
 
@@ -984,6 +1006,20 @@ $(document).ready(function(){
 			}
 			img.src = prop.url || "";
 		});
+	}
+
+	function imageDataToFileBlob(data){
+		var png = data.split(',')[1];
+		var file = new Blob([window.atob(png)],  {type: 'image/png', encoding: 'utf-8'});
+
+		var fr = new FileReader();
+		fr.onload = function(e){
+			var v = e.target.result.split(',')[1]; // encoding is messed up here, so we fix it
+			v = atob(v);
+			var good_b64 = btoa(decodeURIComponent(escape(v)));
+			document.getElementById("uploadPreview").src = "data:image/png;base64," + good_b64;
+		}
+		fr.readAsDataURL(file);
 	}
 
 	// Slider Displays Value

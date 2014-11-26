@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
 from django.conf import settings
 from django.core.files.storage import default_storage as storage
+from django.core.files.base import ContentFile
 from boto.s3.connection import S3Connection, Bucket, Key
 import json, os, time
 
@@ -99,9 +100,9 @@ def scenes(request):
 
 @csrf_exempt
 def scene(request, scene_id):
-	if request.method == "GET":
-		try:
-			scene = Scene.objects.get(id=scene_id)
+	try:
+		scene = Scene.objects.get(id=scene_id)
+		if request.method == "GET":
 			response_data = {}
 			scene_rep = {
 				"id" : scene.id,
@@ -143,65 +144,70 @@ def scene(request, scene_id):
 					scene_rep["props"].append(prop_rep)
 			response_data["scene"] = scene_rep
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
-		except ObjectDoesNotExist:
-			return HttpResponse(status=404)
-	elif request.method == "PUT":
-		# Update Scene
-		scene = Scene.objects.get(id=scene_id)
-		data = json.loads(request.body)
-		if not data.has_key("update"):
-			return HttpResponse(status=400)
-		if not data["update"].has_key("type"):
-			return HttpResponse(status=400)
-		update = data["update"]
-		if update["type"] == "META":
-			# Name, Description, Version")
-			if update.has_key("name"):
-				scene.name = update["name"]
-			if update.has_key("description"):
-				scene.description = update["description"]
-		elif update["type"] == "BACKGROUND":
-			# Background Scale
-			if update.has_key("background_scale") and update["background_scale"] >= 0:
-				scene.background_scale = update["background_scale"]
-		elif update["type"] == "PROP":
-			# SceneProp attributes
-			try:
-				if update.has_key("scene_prop"):
-					scene_prop = SceneProp.objects.get(id=update["scene_prop"])
-				else:
-					return HttpResponse(status=400)
-			except ObjectDoesNotExist:
-				return HttpResponse(status=404)
-			if update.has_key("scale") and update["scale"] >= 0:
-				scene_prop.scale = update["scale"]
-			if update.has_key("position_x"):
-				scene_prop.position_x = update["position_x"]
-			if update.has_key("position_y"):
-				scene_prop.position_y = update["position_y"]
-			if update.has_key("index") and update["index"] >= 500 and update["index"] <= 4000:
-				scene_prop.index = update["index"]
-			if update.has_key("rotation"):
-				scene_prop.rotation = update["rotation"]
-			scene_prop.save()
-		else:
-			return HttpResponse(status=400)
-		scene.save()
-	elif request.method == "DELETE":
-		scene = Scene.objects.get(id=scene_id)
-		# delete all scene_props from the scene
-		scene_props = SceneProp.objects.filter(scene=scene)
-		for scene_prop in scene_props:
-			scene = scene_prop.scene
-			scene_prop.delete()
+		elif request.method == "PUT":
+			# Update Scene
+			scene = Scene.objects.get(id=scene_id)
+			data = json.loads(request.body)
+			if not data.has_key("update"):
+				return HttpResponse(status=400)
+			if not data["update"].has_key("type"):
+				return HttpResponse(status=400)
+			update = data["update"]
+			if update["type"] == "META":
+				# Name, Description, Version")
+				if update.has_key("name"):
+					scene.name = update["name"]
+				if update.has_key("description"):
+					scene.description = update["description"]
+			elif update["type"] == "SCENE":
+				if update.has_key("thumbnail"):
+					decoded_image = update["thumbnail"].decode('base64')
+					scene.thumbnail = ContentFile(decoded_image, "thumbnail.png")
+			elif update["type"] == "BACKGROUND":
+				# Background Scale
+				if update.has_key("background_scale") and update["background_scale"] >= 0:
+					scene.background_scale = update["background_scale"]
+			elif update["type"] == "PROP":
+				# SceneProp attributes
+				try:
+					if update.has_key("scene_prop"):
+						scene_prop = SceneProp.objects.get(id=update["scene_prop"])
+					else:
+						return HttpResponse(status=400)
+				except ObjectDoesNotExist:
+					return HttpResponse(status=404)
+				if update.has_key("scale") and update["scale"] >= 0:
+					scene_prop.scale = update["scale"]
+				if update.has_key("position_x"):
+					scene_prop.position_x = update["position_x"]
+				if update.has_key("position_y"):
+					scene_prop.position_y = update["position_y"]
+				if update.has_key("index") and update["index"] >= 500 and update["index"] <= 4000:
+					scene_prop.index = update["index"]
+				if update.has_key("rotation"):
+					scene_prop.rotation = update["rotation"]
+				scene_prop.save()
+			else:
+				return HttpResponse(status=400)
 			scene.save()
-		# delete scene
-		scene.delete()
-		response_data = { "success" : True }
-		return HttpResponse(json.dumps(response_data), content_type="application/json")
-	else:
-		return HttpResponseNotAllowed(['GET', 'PUT', 'DELETE'])
-
+			response_data = { "success" : True }
+			return HttpResponse(json.dumps(response_data), content_type="application/json")
+		elif request.method == "DELETE":
+			scene = Scene.objects.get(id=scene_id)
+			# delete all scene_props from the scene
+			scene_props = SceneProp.objects.filter(scene=scene)
+			for scene_prop in scene_props:
+				scene = scene_prop.scene
+				scene_prop.delete()
+				scene.save()
+			# delete scene
+			scene.delete()
+			response_data = { "success" : True }
+			return HttpResponse(json.dumps(response_data), content_type="application/json")
+		else:
+			return HttpResponseNotAllowed(['GET', 'PUT', 'DELETE'])
+	except ObjectDoesNotExist:
+		return HttpResponse(status=404)
 	return HttpResponse(status=200)
 
 @csrf_exempt
