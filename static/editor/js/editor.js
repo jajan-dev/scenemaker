@@ -351,12 +351,9 @@ $(document).ready(function(){
 				if (!result.success){
 					console.log("Unable to save scene thumbnail");
 				}
-				else {
-					console.log(thumb.src.split(',')[1]);
-				}
 			},
 			error : function(error){
-				console.log(error);
+				console.log(error.statusText);
 			}
 		})
 	}
@@ -801,7 +798,6 @@ $(document).ready(function(){
 		// Create New Form with Background Image
 		var data = new FormData();
 		$.each(files, function(key,value){
-			console.log(value);
 			data.append("background",value);
 		});
 

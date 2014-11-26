@@ -41,6 +41,8 @@ def scenes(request):
 					"background_scale" : float(scene.background_scale),
 					"props" : []
 				}
+				if scene.thumbnail is not None:
+					scene_rep["thumbnail"] = scene.thumbnail.url
 				if scene.background is not None:
 					background = Background.objects.get(id=scene.background.id)
 					scene_rep["background"] = {
@@ -118,6 +120,8 @@ def scene(request, scene_id):
 				"background_scale" : float(scene.background_scale),
 				"props" : []
 			}
+			if scene.thumbnail is not None:
+				scene_rep["thumbnail"] = scene.thumbnail.url
 			if scene.background is not None:
 				background = Background.objects.get(id=scene.background.id)
 				scene_rep["background"] = {
@@ -222,6 +226,8 @@ def scene_resources(request, scene_id):
 				"version" : scene.version.isoformat(' '),
 				"props" : []
 			}
+			if scene.thumbnail is not None:
+				response_data["scene"]["thumbnail"] = scene.thumbnail.url
 			if scene.background is not None:
 				background = Background.objects.get(id=scene.background.id)
 				response_data["scene"]["background"] = {
@@ -261,8 +267,9 @@ def scene_placement(request, scene_id):
 				"background" : {
 					"id" : "",
 					"name" : "",
-					"description" : "",
-					"url" : "/static/editor/img/blank-background.jpg"
+					"position-x" : 0,
+					"position-y" : 0,
+					"scale" : 1.0
 				},
 				"props" : []
 			}
