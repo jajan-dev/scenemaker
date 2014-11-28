@@ -42,7 +42,10 @@ def scenes(request):
 					"props" : []
 				}
 				if scene.thumbnail is not None:
-					scene_rep["thumbnail"] = scene.thumbnail.url
+					try:
+						scene_rep["thumbnail"] = scene.thumbnail.url
+					except ValueError:
+						scene_rep["thumbnail"] = None
 				if scene.background is not None:
 					background = Background.objects.get(id=scene.background.id)
 					scene_rep["background"] = {
@@ -121,7 +124,10 @@ def scene(request, scene_id):
 				"props" : []
 			}
 			if scene.thumbnail is not None:
-				scene_rep["thumbnail"] = scene.thumbnail.url
+				try:
+					scene_rep["thumbnail"] = scene.thumbnail.url
+				except ValueError:
+					scene_rep["thumbnail"] = None
 			if scene.background is not None:
 				background = Background.objects.get(id=scene.background.id)
 				scene_rep["background"] = {
