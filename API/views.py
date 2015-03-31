@@ -555,19 +555,22 @@ def prop(request, prop_id):
 		return HttpResponseNotAllowed(['GET', 'PUT', 'DELETE'])
 	return HttpResponse("API call for prop #" + prop_id)
 
-def props_by_name(request,name):
+def props_by_name(request):
 	if request.method == "GET":
 		try:
-			prop = Prop.objects.filter(name=name)
-			response_data = {
-				"success" : True,
-				"prop" : {
+			response_data = []
+			name = request.GET.get('name','')
+			if name == '':
+				return HttpResponse(json.dumps(response_data), content_type="application/json")
+			props = Prop.objects.filter(name=name)
+			for prop in props:
+				entry = {
 					"id" : prop.id,
 					"name" : prop.name,
 					"description" : prop.description,
 					"url" : prop.image.url
 				}
-			}
+				response_data.append(entry)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		except ObjectDoesNotExist:
 			return HttpResponse(status=404)
