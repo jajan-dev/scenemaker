@@ -555,6 +555,25 @@ def prop(request, prop_id):
 		return HttpResponseNotAllowed(['GET', 'PUT', 'DELETE'])
 	return HttpResponse("API call for prop #" + prop_id)
 
+def props_by_name(request,name):
+	if request.method == "GET":
+		try:
+			prop = Prop.objects.filter(name=name)
+			response_data = {
+				"success" : True,
+				"prop" : {
+					"id" : prop.id,
+					"name" : prop.name,
+					"description" : prop.description,
+					"url" : prop.image.url
+				}
+			}
+			return HttpResponse(json.dumps(response_data), content_type="application/json")
+		except ObjectDoesNotExist:
+			return HttpResponse(status=404)
+	else:
+		return HttpResponseNotAllowed(['GET'])
+
 def save_file(file, path=''):
 	''' Little helper to save a file
 	'''

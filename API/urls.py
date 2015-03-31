@@ -15,4 +15,5 @@ urlpatterns = patterns('',
 	url(r'^backgrounds', views.backgrounds, name='backgrounds'),
 	url(r'^props/(?P<prop_id>\d+)', views.prop, name='prop'),
 	url(r'^props', views.props, name='props'),
+	url(r'^props_by_name', views.props_by_name, name='props_by_name'),
 )
