@@ -784,6 +784,8 @@ $(document).ready(function(){
 	// Background Image Uploaded Event Listener
 	$("#new-background").on('change.bs.fileinput', function(){
 
+		// TODO: Allow for entering of name, keyword, and description (MODAL?)
+
 		// Get File
 		var files = [this.files[0]];
 		var file = files[0];
@@ -812,6 +814,8 @@ $(document).ready(function(){
 	// Prop Image Uploaded Event Listener
 	$("#new-prop").on('change.bs.fileinput', function(){
 		
+		// TODO: Allow for entering of name, keyword, and description (MODAL?)
+
 		// Get File
 		var files = [this.files[0]];
 		var file = files[0];

@@ -37,8 +37,10 @@ class SceneProp(models.Model):
 	scale = models.DecimalField(decimal_places=2,max_digits=8, default=1.0)
 	position_x = models.IntegerField(default=0)
 	position_y = models.IntegerField(default=0)
+	movable = models.BooleanField(default=True)
 	index = models.IntegerField(default=500)
 	rotation = models.DecimalField(decimal_places=2,max_digits=8, default=0.0)
+	visible = models.BooleanField(default=True)
 
 	def __unicode__(self):
 		return self.scene.name + " - " + self.prop_file.name
@@ -48,6 +50,7 @@ class Background(models.Model):
 
 	## Metadata
 	name = models.CharField(max_length=50)
+	keyword = models.CharField(max_length=50)
 	description = models.CharField(max_length=500, blank=True)
 
 	## Image Key
@@ -66,6 +69,7 @@ class Prop(models.Model):
 
 	## Metadata
 	name = models.CharField(max_length=50)
+	keyword = models.CharField(max_length=50)
 	description = models.CharField(max_length=500, blank=True)
 
 	## Image Key
