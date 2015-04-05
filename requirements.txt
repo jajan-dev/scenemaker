@@ -1,4 +1,4 @@
-Django==1.7.1
+Django==1.6
 -e git://github.com/errkk/gitpil.git@64ffdd2eda26e550c3db4a3fa958a1f10017dc67#egg=PIL-master
 argparse==1.2.1
 boto==2.19.0

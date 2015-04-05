@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm9hw^x^a(@zcl(_dstx2#j85a0voj&36emu@$3%oncarn_y=k7'
+SECRET_KEY = 'cs_@fveuuo1k#*8y+y301j@1+n^z!2a6@^7+2s_)d#q4t_9#1@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,13 +31,13 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = (
     'django.contrib.admin',
+    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'API',
-    'storages'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,6 +47,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.contrib.admin',
+    # 'django.contrib.admindocs',
 )
 
 ROOT_URLCONF = 'SceneMaker.urls'
@@ -56,16 +58,15 @@ WSGI_APPLICATION = 'SceneMaker.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-import dj_database_url
-DATABASES = {}
-DATABASES['default'] =  dj_database_url.config()
-if not DATABASES['default'].has_key('ENGINE'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'jajan+scenemaker',
+        'USER': 'jajan',
+        'PASSWORD': 'jajandevpw',
+        'HOST': 'sql.mit.edu'
     }
+}
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

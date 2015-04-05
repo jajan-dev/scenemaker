@@ -12,7 +12,7 @@ $(document).ready(function(){
 	function newBackground(formData, addToScene){
 		$.ajax({
 			type : "POST",
-			url : "/api/backgrounds/",
+			url : "/scenemaker/api/backgrounds/",
 			data : formData,
 			processData : false,
 			contentType : false,
@@ -38,7 +38,7 @@ $(document).ready(function(){
 		// Create a Thumbnail
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
-		thumb.src = background.url || "/media/default/question-mark.jpg";
+		thumb.src = background.url || "/scenemaker/media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection
@@ -63,7 +63,7 @@ $(document).ready(function(){
 		$.ajax({
 			// TODO Scene Thumbnail
 			type : "POST",
-			url : "/api/scenes/" + scene.id + "/background/set",
+			url : "/scenemaker/api/scenes/" + scene.id + "/background/set",
 			data : JSON.stringify({ background : background.id }),
 			success : function(result){
 				
@@ -110,7 +110,7 @@ $(document).ready(function(){
 	function newProp(formData, addToScene){
 		$.ajax({
 			type : "POST",
-			url : "/api/props/",
+			url : "/scenemaker/api/props/",
 			data : formData,
 			processData : false,
 			contentType : false,
@@ -134,7 +134,7 @@ $(document).ready(function(){
 
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
-		thumb.src = prop.url || "/media/default/question-mark.jpg";
+		thumb.src = prop.url || "/scenemaker/media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail").data("prop", prop);
 		var thumbContainer = $("<span></span>").append(thumb).data("prop", prop);
 		$("#props-collection").append(thumbContainer);
@@ -153,7 +153,7 @@ $(document).ready(function(){
 		$.ajax({
 			// TODO Scene Thumbnail
 			type : "POST",
-			url : "/api/scenes/" + scene.id + "/props/add",
+			url : "/scenemaker/api/scenes/" + scene.id + "/props/add",
 			data : JSON.stringify({ prop : prop.id }),
 			success : function(result){
 				scene.props[result.prop.scene_prop_id] = result.prop;
@@ -171,7 +171,7 @@ $(document).ready(function(){
 		$.ajax({
 			// TODO Scene Thumbnail
 			type : "DELETE",
-			url : "/api/scenes/props/" + scene_prop_id,
+			url : "/scenemaker/api/scenes/props/" + scene_prop_id,
 			success : function(result){
 				if (result.success){
 					
@@ -241,7 +241,7 @@ $(document).ready(function(){
 		$.ajax({
 			// TODO Scene Thumbnail
 			type : "PUT",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify(update),
 			success : function(result){
 				// Saved
@@ -261,7 +261,7 @@ $(document).ready(function(){
 			// TODO Scene Thumbnail
 			// SPECIAL
 			type : "POST",
-			url : "/api/scenes",
+			url : "/scenemaker/api/scenes",
 			data : JSON.stringify({
 				name : name,
 				description : description
@@ -340,7 +340,7 @@ $(document).ready(function(){
 	function updateSceneModelThumbnail(scene, thumb){
 		$.ajax({
 			type : "PUT",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify({
 				"update" : {
 					"type" : "SCENE",
@@ -481,7 +481,7 @@ $(document).ready(function(){
 	function updateMetadata(data){
 		$.ajax({
 			type : "PUT",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
 			success : function(result){
 				updateMetadataModel(data.update)
@@ -508,7 +508,7 @@ $(document).ready(function(){
 			// TODO Scene Thumbnail
 			// Special
 			type : "PUT",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
 			success : function(result){
 				updateBackgroundModel(data.update);
@@ -542,7 +542,7 @@ $(document).ready(function(){
 			// TODO Scene Thumbnail
 			// Special
 			type : "PUT",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
 			success : function(result){
 				updateScenePropModel(data.update);
@@ -574,7 +574,7 @@ $(document).ready(function(){
 	function deleteScene(){
 		$.ajax({
 			type : "DELETE",
-			url : "/api/scenes/" + scene.id,
+			url : "/scenemaker/api/scenes/" + scene.id,
 			success : function(result){
 				if (result.success){
 					deleteSceneView(scene.id);
@@ -1033,7 +1033,7 @@ $(document).ready(function(){
 	// Load All Scenes
 	$.ajax({
 		type: "GET",
-		url: "/api/scenes",
+		url: "/scenemaker/api/scenes",
 		success: function(result){
 			var scenes = result.scenes;
 			for (var i in scenes){
@@ -1053,7 +1053,7 @@ $(document).ready(function(){
 	// Load All Backgrounds
 	$.ajax({
 		type: "GET",
-		url: "/api/backgrounds",
+		url: "/scenemaker/api/backgrounds",
 		success: function(result){
 			var backgrounds = result.backgrounds;
 			for (var i in backgrounds){
@@ -1066,7 +1066,7 @@ $(document).ready(function(){
 	// Load All Props
 	$.ajax({
 		type: "GET",
-		url: "/api/props",
+		url: "/scenemaker/api/props",
 		success: function(result){
 			var props = result.props;
 			for (var i in props){
