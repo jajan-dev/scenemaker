@@ -15,7 +15,4 @@ urlpatterns = patterns('',
     url(r'signup/^$', views.signup),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include('API.urls', namespace='API')),
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-if not settings.USE_AWS:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+)

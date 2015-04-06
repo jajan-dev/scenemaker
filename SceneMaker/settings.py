@@ -38,6 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'API',
+    'storages',
+    'south',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -89,11 +91,11 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
-if os.environ.has_key('USE_AWS') and os.environ['USE_AWS']:
+if os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/course/urop/jajan':
     USE_AWS = True
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-    AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-    AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+    AWS_ACCESS_KEY_ID = 'AKIAIEV4LDWLMWWHLDMA'
+    AWS_SECRET_ACCESS_KEY = '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'
     AWS_STORAGE_BUCKET_NAME = 'jajan-scenemaker-assets'
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = True
@@ -107,6 +109,7 @@ else:
 
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )

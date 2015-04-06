@@ -475,10 +475,7 @@ def props(request):
 	if request.method == "GET":
 		# GET ALL (NON-FORBIDDEN)
 		response_data = { "props" : [] }
-		name = request.GET.get('name','')
-		if name == '':
-			return HttpResponse(json.dumps(response_data), content_type="application/json")
-		props = Prop.objects.filter(name=name)
+		props = Prop.objects.all()
 		for prop in props:
 			obj = {
 				"id" : prop.id,
