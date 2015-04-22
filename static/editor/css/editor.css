@@ -49,7 +49,7 @@
 	height: 180px;
 	background-color: #f5f5f5;
 	border-top: 2px solid #ddd;
-	overflow-y: scroll;
+/*	overflow-y: scroll;*/
 }
 
 @media(min-width: 700px) {
@@ -75,6 +75,10 @@
 	height : 72px;
 }
 
+.scene-thumbnail-element {
+	display : inline-block;
+}
+
 .prop-thumbnail {
 	width: 50px;
 }
@@ -89,8 +93,10 @@
 }
 
 .image-collection {
+	white-space:nowrap;
 	height: 100px;
-	overflow-y: wrap;
+	overflow-y: hidden;
+	overflow-x: scroll;
 }
 
 #sidebar-wrapper {
@@ -139,6 +145,8 @@
     }
 
     .image-collection {
-    	overflow-y: scroll;
+    	white-space:nowrap;
+    	overflow-y: hidden;
+    	overflow-x: scroll;
     }
 }

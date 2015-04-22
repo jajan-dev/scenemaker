@@ -24,7 +24,7 @@ def scenes(request):
 		# GET ALL - later
 		try:
 			domain = request.get_host()
-			scenes = Scene.objects.all()
+			scenes = Scene.objects.order_by('-version')
 			response_data = { "scenes" : [], "success" : True }
 			for scene in scenes:
 				scene_rep = {

@@ -326,6 +326,7 @@ $(document).ready(function(){
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
 			var thumbElement = $("<span></span>").addClass("scene-thumbnail-element").append(thumb).data("scene", scene);
 			$(thumb).data("scene", scene);
+			console.log("append");
 			$("#scene-collection").append(thumbElement);
 
 			// Event Listener for Background Thumbnail - Selection / Set
@@ -378,7 +379,6 @@ $(document).ready(function(){
 	}
 
 	function updateSceneModelThumbnail(scene, thumb){
-		console.log("updating scene thumbnail");
 		$.ajax({
 			type : "PUT",
 			url : "/scenemaker/api/scenes/" + scene.id,
@@ -1076,6 +1076,7 @@ $(document).ready(function(){
 		url: "/scenemaker/api/scenes",
 		success: function(result){
 			var scenes = result.scenes;
+			console.log(scenes.length);
 			for (var i in scenes){
 				var load_scene = scenes[i];
 				var props_array = load_scene.props;
