@@ -257,6 +257,10 @@ $(document).ready(function(){
 
 	// Save New Scene on Server
 	function newScene(name, description){
+		var canvas = $("<canvas></canvas>")[0];
+		canvas.height = 72;
+		canvas.width = 128;
+		var thumbData = canvas.toDataURL();
 		$.ajax({
 			// TODO Scene Thumbnail
 			// SPECIAL
@@ -264,7 +268,8 @@ $(document).ready(function(){
 			url : "/scenemaker/api/scenes",
 			data : JSON.stringify({
 				name : name,
-				description : description
+				description : description,
+				thumbnail : thumbData.split(',')[1]
 			}),
 			success : function(result){
 				newSceneView(result.scene);
@@ -306,6 +311,42 @@ $(document).ready(function(){
 
 	}
 
+	function loadSceneThumbnail(scene,callback){
+		// Create a Thumbnail
+		var thumb = new Image();
+		thumb.crossOrigin = "Anonymous";
+
+		if (!scene.thumbnail){
+			scene.thumbnail = "/static/editor/img/blank-background-thumbnail.jpg";
+		}
+
+		var onLoad = function(e){
+			thumb.removeEventListener("load", onLoad);
+			
+			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
+			var thumbElement = $("<span></span>").addClass("scene-thumbnail-element").append(thumb).data("scene", scene);
+			$(thumb).data("scene", scene);
+			$("#scene-collection").append(thumbElement);
+
+			// Event Listener for Background Thumbnail - Selection / Set
+			$(thumb).dblclick(function(event){
+				// Set Current Scene using Scene Data Model Representation
+				changeScene(scene);
+			});
+
+			// $(".scene-thumbnail").filter(function(){
+			// 	return $(this).data("scene").id === scene.id;
+			// }).attr("src", scene.thumbnail);
+		}
+		thumb.addEventListener("load", onLoad, false);
+		thumb.src = scene.thumbnail;
+
+
+		// $(".scene-thumbnail").filter(function(){
+		// 	return $(this).data("scene").id === scene.id;
+		// }).attr("src", scene.thumbnail);
+	}
+
 	function addSceneThumbnail(scene){
 
 		// Create Thumbnail
@@ -327,7 +368,6 @@ $(document).ready(function(){
 	}
 
 	function changeSceneThumbnail(scene){
-
 		createSceneThumbnailImage(scene, function(thumb){
 			// Change Thumbnail
 			$(".scene-thumbnail").filter(function(){
@@ -338,6 +378,7 @@ $(document).ready(function(){
 	}
 
 	function updateSceneModelThumbnail(scene, thumb){
+		console.log("updating scene thumbnail");
 		$.ajax({
 			type : "PUT",
 			url : "/scenemaker/api/scenes/" + scene.id,
@@ -373,7 +414,6 @@ $(document).ready(function(){
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
 
-		// Draw Background
 		var backgroundImage = new Image();
 		backgroundImage.crossOrigin = "Anonymous";
 		backgroundImage.onload = function(){
@@ -1045,7 +1085,8 @@ $(document).ready(function(){
 					load_scene.props[prop.scene_prop_id] = prop;
 				}
 				scenes[load_scene.id] = load_scene;
-				addSceneThumbnail(load_scene);
+				loadSceneThumbnail(load_scene);
+				// addSceneThumbnail(load_scene);
 			}
 		}
 	});

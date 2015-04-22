@@ -80,6 +80,9 @@ def scenes(request):
 			data = json.loads(request.body)
 			new_scene = Scene(name=data['name'], description=data['description'], background_scale=1.0)
 			new_scene.save()
+			decoded_image = data["thumbnail"].decode('base64')
+			new_scene.thumbnail = ContentFile(decoded_image, "thumbnail.png")
+			new_scene.save()
 			response_data = {
 				"success" : True,
 				"scene" : {
