@@ -1202,8 +1202,33 @@ $(document).ready(function(){
 	adjustSceneDimension();
 
 	// Dropdown Select and Type
-	$(".link-next-scene-select").select2({
-		placeholder: "Select a scene",
-		width: "element"
+	var localSceneOptions = ['this', 'is', 'a', 'test'];
+
+	function substringMatcher(strs){
+		return function findMatches(query, callback){
+			var matches, substringRegex;
+
+			matches = [];
+
+			substringRegex = new RegExp(query, 'i');
+
+			$.each(strs, function(i, str){
+				if (substringRegex.test(str)){
+					matches.push(str);
+				}
+			});
+
+			callback(matches);
+		}
+	}
+
+	$(".typeahead").typeahead({
+		hint: true,
+		minLength: 1,
+		highlight: true
+	},
+	{
+		name: 'my-dataset',
+		source: substringMatcher(localSceneOptions)
 	});
 });
