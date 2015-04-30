@@ -65,9 +65,12 @@ def scenes(request):
 							"url" : prop.image.url,
 							"position_x" : scene_prop.position_x,
 							"position_y" : scene_prop.position_y,
+							"movable" : scene_prop.movable,
 							"scale" : float(scene_prop.scale),
 							"index" : scene_prop.index,
-							"rotation" : float(scene_prop.rotation)
+							"rotation" : float(scene_prop.rotation),
+							"visible" : scene_prop.visible,
+							"always_visible" : scene_prop.always_visible
 						}
 						scene_rep["props"].append(prop_rep)
 				response_data["scenes"].append(scene_rep)
@@ -150,9 +153,12 @@ def scene(request, scene_id):
 						"url" : prop.image.url,
 						"position_x" : scene_prop.position_x,
 						"position_y" : scene_prop.position_y,
+						"movable" : scene_prop.movable,
 						"scale" : float(scene_prop.scale),
 						"index" : scene_prop.index,
-						"rotation" : float(scene_prop.rotation)
+						"rotation" : float(scene_prop.rotation),
+						"visible" : scene_prop.visible,
+						"always_visible" : scene_prop.always_visible
 					}
 					scene_rep["props"].append(prop_rep)
 			response_data["scene"] = scene_rep
@@ -195,10 +201,16 @@ def scene(request, scene_id):
 					scene_prop.position_x = update["position_x"]
 				if update.has_key("position_y"):
 					scene_prop.position_y = update["position_y"]
+				if update.has_key("movable"):
+					scene_prop.movable = update["movable"]
 				if update.has_key("index") and update["index"] >= 500 and update["index"] <= 4000:
 					scene_prop.index = update["index"]
 				if update.has_key("rotation"):
 					scene_prop.rotation = update["rotation"]
+				if update.has_key("visible"):
+					scene_prop.visible = update["visible"]
+				if update.has_key("always_visible"):
+					scene_prop.always_visible = update["always_visible"]
 				scene_prop.save()
 			else:
 				return HttpResponse(status=400)
@@ -300,9 +312,12 @@ def scene_placement(request, scene_id):
 						"name" : prop.name,
 						"position-x" : scene_prop.position_x,
 						"position-y" : scene_prop.position_y,
+						"movable" : scene_prop.movable,
 						"scale" : float(scene_prop.scale),
 						"index" : scene_prop.index,
-						"rotation" : float(scene_prop.rotation)
+						"rotation" : float(scene_prop.rotation),
+						"visible" : scene_prop.visible,
+						"always_visible" : scene_prop.always_visible
 					}
 					response_data["scene"]["props"].append(obj)
 			return HttpResponse(json.dumps(response_data), content_type="application/json")

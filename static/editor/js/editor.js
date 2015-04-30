@@ -91,6 +91,7 @@ $(document).ready(function(){
 	function renderBackgroundView(background){
 
 		$("#scene-background-image")
+			.attr("crossorigin", "Anonymous")
 			.attr("src", background.url || "")
 			.css("display", "block")
 			.attr("draggable", false);
@@ -108,6 +109,7 @@ $(document).ready(function(){
 
 	// Save New Prop to Server
 	function newProp(formData, addToScene){
+		console.log("NEW PROP", formData);
 		$.ajax({
 			type : "POST",
 			url : "/scenemaker/api/props/",
@@ -485,6 +487,7 @@ $(document).ready(function(){
 		$("#editor-scene-name-value").text(scene.name || "");
 		$("#editor-scene-description-value").text(scene.description || "");
 		scene.id ? $("#edit-scene-btn").removeClass("disabled") : $("#edit-scene-btn").addClass("disabled");
+		scene.id ? $("#link-next-scene-btn").removeClass("disabled") : $("#link-next-scene-btn").addClass("disabled");
 		scene.id ? $("#delete-scene-btn").removeClass("disabled") : $("#delete-scene-btn").addClass("disabled");
 		scene.id ? $(".new-asset-btn-group").removeClass("disabled") : $(".new-asset-btn-group").addClass("disabled");
 		$("#add-background-label").text(scene.id ? "Change Background" : "Add Background");
@@ -824,64 +827,96 @@ $(document).ready(function(){
 	// Background Image Uploaded Event Listener
 	$("#new-background").on('change.bs.fileinput', function(){
 
-		// TODO: Allow for entering of name, keyword, and description (MODAL?)
-
-		// Get File
 		var files = [this.files[0]];
 		var file = files[0];
-
-		// Read File
-		var backgroundFr = new FileReader();
-		backgroundFr.readAsDataURL(file);
-
+		
 		// Reset Upload Tool (Blank)
 		$("#new-background").replaceWith($("#new-background").val('').clone(true));
-		
-		// Create New Form with Background Image
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("background",value);
+
+		if (!file){
+			return;
+		}
+
+		// Allow for entering of name, keyword, and description (MODAL?)
+		$("#new-background-name").val("");
+		$("#new-background-description").val("");
+		$("#new-background-modal").modal("show");
+
+		$("#upload-new-background-btn").on("click", function(event){
+			// Get User Input
+			var name = $("#new-background-name").val();
+			var description = $("#new-background-description").val();
+
+			// Read File
+			var backgroundFr = new FileReader();
+			backgroundFr.readAsDataURL(file);
+			
+			// Create New Form with Background Image
+			var data = new FormData();
+			data.append("background", file);
+
+			// Background Image Metadata - TODO
+			data.append("name", name);
+			data.append("description", description);
+			
+			// Save New Background to Server
+			newBackground(data, false);
 		});
 
-		// Background Image Metadata - TODO
-		data.append("name", "BACKGROUND_NAME");
-		data.append("description", "BACKGROUND_DESCRIPTION");
-		
-		// Save New Background to Server
-		newBackground(data, false);
+		$("#new-background-modal").on("hide.bs.modal", function(event){
+			$("#upload-new-background-btn").unbind();
+		});
+
 	});
 
 	// Prop Image Uploaded Event Listener
 	$("#new-prop").on('change.bs.fileinput', function(){
-		
-		// TODO: Allow for entering of name, keyword, and description (MODAL?)
 
 		// Get File
 		var files = [this.files[0]];
 		var file = files[0];
 
-		// Read File
-		var propFr = new FileReader();
-		propFr.readAsDataURL(file);
-
 		// Reset Upload Tool (Blank)
 		$("#new-prop").replaceWith($("#new-prop").val('').clone(true));
 
-		// Create New Form with Prop Image
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("prop",value);
+		if (!file){
+			return;
+		}
+
+		$("#new-prop-name").val("");
+		$("#new-prop-description").val("");
+		$("#new-prop-modal").modal("show");
+
+		// Allow for entering of name, keyword, and description (MODAL?)
+		$("#upload-new-prop-btn").on("click", function(event){
+			// Get User Input
+			var name = $("#new-prop-name").val();
+			var description = $("#new-prop-description").val();
+
+			// Read File
+			var propFr = new FileReader();
+			propFr.readAsDataURL(file);
+
+			// Create New Form with Prop Image
+			var data = new FormData();
+			data.append("prop",file);
+
+			// Prop Image Metadata - TODO
+			data.append("name", name);
+			data.append("description", description);
+
+			newProp(data, false);
 		});
 
-		// Prop Image Metadata - TODO
-		data.append("name", "SCENEPROP_NAME");
-		data.append("description", "SCENEPROP_DESCRIPTION");
-
-		newProp(data, false);
+		$("#new-prop-modal").on("hide.bs.modal", function(event){
+			$("#upload-new-prop-btn").unbind();
+		});
 	});
 
 	// Background Image Uploaded and Add Event Listener
 	$("#upload-add-background").on('change.bs.fileinput', function(){
+
+		// TODO write function for following code
 
 		// Get File
 		var files = [this.files[0]];
@@ -893,46 +928,85 @@ $(document).ready(function(){
 
 		// Reset Upload Tool (Blank)
 		$("#upload-add-background").replaceWith($("#upload-add-background").val('').clone(true));
+
+		if (!file){
+			return;
+		}
+
+		$("#upload-add-background-name").val("");
+		$("#upload-add-background-description").val("");
+		$("#upload-add-background-modal").modal("show");
 		
-		// Create New Form with Background Image
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("background",value);
+		// Allow for entering of name, keyword, and description (MODAL?)
+		$("#upload-add-background-btn").on("click", function(event){
+			// Get User Input
+			var name = $("#upload-add-background-name").val();
+			var description = $("#upload-add-background-description").val();
+
+			// Read File
+			var propFr = new FileReader();
+			propFr.readAsDataURL(file);
+
+			// Create New Form with Prop Image
+			var data = new FormData();
+			data.append("background",file);
+
+			// Prop Image Metadata - TODO
+			data.append("name", name);
+			data.append("description", description);
+
+			newBackground(data, true);
 		});
 
-		// Background Image Metadata - TODO
-		data.append("name", "BACKGROUND_NAME");
-		data.append("description", "BACKGROUND_DESCRIPTION");
-		
-		// Save New Background to Server
-		newBackground(data, true);
+		$("#upload-add-background-modal").on("hide.bs.modal", function(event){
+			$("#upload-add-background-btn").unbind();
+		});
 	});
 
 	// Prop Image Uploaded Event Listener
 	$("#upload-add-prop").on('change.bs.fileinput', function(){
 		
+		// TODO: write function for following code
+
 		// Get File
 		var files = [this.files[0]];
 		var file = files[0];
 
-		// Read File
-		var propFr = new FileReader();
-		propFr.readAsDataURL(file);
-
 		// Reset Upload Tool (Blank)
 		$("#upload-add-prop").replaceWith($("#upload-add-prop").val('').clone(true));
 
-		// Create New Form with Prop Image
-		var data = new FormData();
-		$.each(files, function(key,value){
-			data.append("prop",value);
+		if (!file){
+			return;
+		}
+
+		$("#upload-add-prop-name").val("");
+		$("#upload-add-prop-description").val("");
+		$("#upload-add-prop-modal").modal("show");
+
+		// Allow for entering of name, keyword, and description (MODAL?)
+		$("#upload-add-prop-btn").on("click", function(event){
+			// Get User Input
+			var name = $("#upload-add-prop-name").val();
+			var description = $("#upload-add-prop-description").val();
+
+			// Read File
+			var propFr = new FileReader();
+			propFr.readAsDataURL(file);
+
+			// Create New Form with Prop Image
+			var data = new FormData();
+			data.append("prop",file);
+
+			// Prop Image Metadata - TODO
+			data.append("name", name);
+			data.append("description", description);
+
+			newProp(data, true);
 		});
 
-		// Prop Image Metadata - TODO
-		data.append("name", "SCENEPROP_NAME");
-		data.append("description", "SCENEPROP_DESCRIPTION");
-
-		newProp(data, true);
+		$("#upload-add-prop-modal").on("hide.bs.modal", function(event){
+			$("#upload-add-prop-btn").unbind();
+		});
 	});
 
 	// Modal Event Listeners
@@ -954,6 +1028,9 @@ $(document).ready(function(){
 		$("#edit-prop-scale").val(prop.scale);
 		$("#edit-prop-index").val(prop.index);
 		$("#edit-prop-index-value").text($("#edit-prop-index").val());
+		$("#edit-prop-movable").attr("checked", prop.movable);
+		$("#edit-prop-visible").attr("checked", prop.visible);
+		$("#edit-prop-always-visible").attr("checked", prop.always_visible);
 	});
 
 	$("#update-metadata-btn").click(function(event){
@@ -984,10 +1061,14 @@ $(document).ready(function(){
 				"type" : "PROP",
 				"scene_prop" : prop.scene_prop_id,
 				"scale" : parseFloat($("#edit-prop-scale").val()),
+				"movable" : $("#edit-prop-movable").is(":checked"),
 				"index" : parseInt($("#edit-prop-index").val(), 10),
 				"rotation" : parseFloat($("#edit-prop-rotation").val() || "0.0"),
+				"visible" : $("#edit-prop-visible").is(":checked"),
+				"always_visible" : $("#edit-prop-always-visible").is(":checked"),
 			}
 		}
+		console.log(data);
 		updateSceneProp(data);
 	});
 
@@ -1119,4 +1200,10 @@ $(document).ready(function(){
 	});
 
 	adjustSceneDimension();
+
+	// Dropdown Select and Type
+	$(".link-next-scene-select").select2({
+		placeholder: "Select a scene",
+		width: "element"
+	});
 });

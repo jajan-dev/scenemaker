@@ -25,6 +25,8 @@
     <![endif]-->
     <link rel="stylesheet" href="{{STATIC_URL}}bootstrap/jasny-bootstrap/css/jasny-bootstrap.min.css">
     <script src="{{STATIC_URL}}bootstrap/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
     <script src="{{STATIC_URL}}bootstrap/context-menu.js"></script>
 
     <link rel="stylesheet" href="{{STATIC_URL}}editor/css/editor.css"></link>
@@ -57,6 +59,7 @@
                     <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
                     <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
                     <div id="edit-scene-btn" class="btn btn-sm btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
+                    <div id="link-next-scene-btn" class="btn btn-sm btn-success disabled" data-toggle="modal" data-target="#link-next-scene-modal">Link Next Scene</div>
                     <div id="delete-scene-btn" class="btn btn-sm btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
                 </div>
                 <hr>
@@ -87,7 +90,7 @@
             <div id="scene-container">
                 <div id="scene">
                     <!-- <div class="aspect-element" id="scene"> -->
-                        <img id="scene-background-image">
+                        <img id="scene-background-image" crossorigin="Anonomyous">
                     <!-- </div> -->
                 </div>
             </div>
@@ -174,6 +177,127 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <!-- New Background -->
+    <div class="modal fade" id="new-background-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">New Background</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="new-background-form" role="form">
+                        <div class="form-group">
+                            <label for="new-background-name">Name: </label>
+                            <input class="form-control" id="new-background-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-background-description">Description: </label>
+                            <input class="form-control" id="new-background-description">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="upload-new-background-btn">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- New Prop -->
+    <div class="modal fade" id="new-prop-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">New Prop</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="new-prop-form" role="form">
+                        <div class="form-group">
+                            <label for="new-prop-name">Name: </label>
+                            <input class="form-control" id="new-prop-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-prop-description">Description: </label>
+                            <input class="form-control" id="new-prop-description">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="upload-new-prop-btn">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Upload Add Background -->
+    <div class="modal fade" id="upload-add-background-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Upload and Add Background</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="upload-add-background-form" role="form">
+                        <div class="form-group">
+                            <label for="upload-add-background-name">Name: </label>
+                            <input class="form-control" id="upload-add-background-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-add-background-description">Description: </label>
+                            <input class="form-control" id="upload-add-background-description">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="upload-add-background-btn">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Upload Add Prop -->
+    <div class="modal fade" id="upload-add-prop-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Upload and Add Prop</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="upload-add-prop-form" role="form">
+                        <div class="form-group">
+                            <label for="upload-add-prop-name">Name: </label>
+                            <input class="form-control" id="upload-add-prop-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="upload-add-prop-description">Description: </label>
+                            <input class="form-control" id="upload-add-prop-description">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="upload-add-prop-btn">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
     <!-- Edit Metadata -->
     <div class="modal fade" id="metadata-modal">
         <div class="modal-dialog">
@@ -198,6 +322,29 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="update-metadata-btn">Update</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Next Scene -->
+    <div class="modal fade" id="link-next-scene-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title">Link Next Scene</h4>
+                </div>
+                <div class="modal-body">
+                    <select class="link-next-scene-select">
+                        <!-- TODO: Populating Options -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" id="delete-scene-btn-action">Link</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -270,6 +417,18 @@
                         <div class="form-group">
                             <label for="edit-prop-index">Index: </label>
                             <input id="edit-prop-index" class="slider" type="range" step="1" min="500" max="4000"><span id="edit-prop-index-value" class="slider-value"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-prop-movable">Movable: </label>
+                            <input id="edit-prop-movable" type="checkbox" />
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-prop-visible">Visible: </label>
+                            <input id="edit-prop-visible" type="checkbox" />
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-prop-always-visible">Always Visible: </label>
+                            <input id="edit-prop-always-visible" type="checkbox" />
                         </div>
                     </form>
                 </div>

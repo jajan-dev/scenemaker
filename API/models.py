@@ -23,6 +23,9 @@ class Scene(models.Model):
 	## Props
 	props = models.ManyToManyField('Prop', through='SceneProp')
 
+	## Story
+	next_scene = models.ForeignKey('Scene', related_name='scenes', related_query_name='scenes', blank=True, null=True)
+
 	def __unicode__(self):
 		return self.name
 
@@ -37,10 +40,11 @@ class SceneProp(models.Model):
 	scale = models.DecimalField(decimal_places=2,max_digits=8, default=1.0)
 	position_x = models.IntegerField(default=0)
 	position_y = models.IntegerField(default=0)
-	movable = models.BooleanField(default=True)
+	movable = models.BooleanField(default=False)
 	index = models.IntegerField(default=500)
 	rotation = models.DecimalField(decimal_places=2,max_digits=8, default=0.0)
-	visible = models.BooleanField(default=True)
+	visible = models.BooleanField(default=False)
+	always_visible = models.BooleanField(default=False)
 
 	def __unicode__(self):
 		return self.scene.name + " - " + self.prop_file.name
