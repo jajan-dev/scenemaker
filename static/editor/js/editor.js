@@ -491,6 +491,9 @@ $(document).ready(function(){
 		scene.id ? $("#delete-scene-btn").removeClass("disabled") : $("#delete-scene-btn").addClass("disabled");
 		scene.id ? $(".new-asset-btn-group").removeClass("disabled") : $(".new-asset-btn-group").addClass("disabled");
 		$("#add-background-label").text(scene.id ? "Change Background" : "Add Background");
+		$(".link-next-scene-select")
+			.prop("disabled", false)
+			.select2("val", scene.next);
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
@@ -543,6 +546,34 @@ $(document).ready(function(){
 		if (update.hasOwnProperty("description")){
 			scene.description = update["description"]; // Model
 			$("#editor-scene-description-value").text(update["description"]); // View
+		}
+	}
+
+	function linkScene(id){
+		var data = {
+			"update" : {
+				"type" : "META",
+				"next" : id
+			}
+		}
+		$.ajax({
+			type : "PUT",
+			url : "/scenemaker/api/scenes/" + scene.id,
+			data : JSON.stringify(data),
+			success : function(result){
+				console.log(result);
+				linkSceneModel(id);
+			},
+			error : function(error){
+				console.log(error);
+			}
+		});
+	}
+
+	function linkSceneModel(id) {
+		if (id){
+			scene.next = id == -1 ? null : id;
+			$(".link-next-scene-select").select2("val", id == -1 ? null : id);
 		}
 	}
 
@@ -1081,6 +1112,15 @@ $(document).ready(function(){
 		deleteScene();
 	});
 
+	$("#link-next-scene-confirm-btn").click(function(event){
+		var id = -1;
+		var val = $(".link-next-scene-select").select2("val");
+		if (val){
+			id = parseFloat(val[0],10);
+		}
+		linkScene(id);
+	});
+
 	// Helper Functions and Event Listeners
 	$('.float-input').keypress(function(event) {
 		if ((event.which != 46 || $(this).val().indexOf('.') != -1) && 
@@ -1168,7 +1208,10 @@ $(document).ready(function(){
 				}
 				scenes[load_scene.id] = load_scene;
 				loadSceneThumbnail(load_scene);
-				// addSceneThumbnail(load_scene);
+				var option = $("<option></option>")
+					.text(load_scene.name + " (ID " + load_scene.id + ")")
+					.val(load_scene.id);
+				$(".link-next-scene-select").append(option);
 			}
 		}
 	});
@@ -1201,34 +1244,10 @@ $(document).ready(function(){
 
 	adjustSceneDimension();
 
-	// Dropdown Select and Type
-	var localSceneOptions = ['this', 'is', 'a', 'test'];
-
-	function substringMatcher(strs){
-		return function findMatches(query, callback){
-			var matches, substringRegex;
-
-			matches = [];
-
-			substringRegex = new RegExp(query, 'i');
-
-			$.each(strs, function(i, str){
-				if (substringRegex.test(str)){
-					matches.push(str);
-				}
-			});
-
-			callback(matches);
-		}
-	}
-
-	$(".typeahead").typeahead({
-		hint: true,
-		minLength: 1,
-		highlight: true
-	},
-	{
-		name: 'my-dataset',
-		source: substringMatcher(localSceneOptions)
+	$(".link-next-scene-select").select2({
+		disabled: true,
+		placeholder: "Select a scene",
+		maximumSelectionLength: 1,
 	});
+
 });

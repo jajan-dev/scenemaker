@@ -16,7 +16,14 @@
     {% load staticfiles %}
     <link rel="stylesheet" href="{{STATIC_URL}}bootstrap/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{STATIC_URL}}bootstrap/bootstrap/css/bootstrap-theme.min.css">
-    <script src="{{STATIC_URL}}bootstrap/bootstrap/js/bootstrap.min.js"></script>
+    <!-- // <script src="{{STATIC_URL}}bootstrap/bootstrap/js/bootstrap.min.js"></script> -->
+    <script src="https://select2.github.io/vendor/js/bootstrap.min.js"></script>
+
+    <!-- Placeholders -->
+    <script src="https://select2.github.io/vendor/js/placeholders.jquery.min.js"></script>
+
+    <!-- Prettify -->
+    <script src="https://select2.github.io/vendor/js/prettify.min.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -25,10 +32,13 @@
     <![endif]-->
     <link rel="stylesheet" href="{{STATIC_URL}}bootstrap/jasny-bootstrap/css/jasny-bootstrap.min.css">
     <script src="{{STATIC_URL}}bootstrap/jasny-bootstrap/js/jasny-bootstrap.min.js"></script>
-    <script src="{{STATIC_URL}}bootstrap/context-menu.js"></script>
+    
+    <!-- Select2 -->
+    <link href="https://select2.github.io/dist/css/select2.min.css" rel="stylesheet"></link>
+    <script src="https://select2.github.io/dist/js/select2.full.js"></script>
 
-    <!-- Typeahead -->
-    <script src="{{STATIC_URL}}typeahead/js/typeahead.bundle.min.js"></script>
+    <!-- Context Menu -->
+    <script src="{{STATIC_URL}}bootstrap/context-menu.js"></script>
 
     <link rel="stylesheet" href="{{STATIC_URL}}editor/css/editor.css"></link>
     <script src="{{STATIC_URL}}editor/js/editor.js"></script>
@@ -60,8 +70,13 @@
                     <div id="editor-scene-name">Name: <span id="editor-scene-name-value"></span></div>
                     <div id="editor-scene-description">Description: <span id="editor-scene-description-value"></span></div>
                     <div id="edit-scene-btn" class="btn btn-sm btn-primary disabled" data-toggle="modal" data-target="#metadata-modal">Edit Information</div>
-                    <div id="link-next-scene-btn" class="btn btn-sm btn-success disabled" data-toggle="modal" data-target="#link-next-scene-modal">Link Next Scene</div>
                     <div id="delete-scene-btn" class="btn btn-sm btn-danger disabled" data-toggle="modal" data-target="#delete-scene-modal">Delete Scene</div>
+                    <br/>
+                    <div id="link-scene">
+                        <div>Link Next Scene: </div>
+                        <select class="link-next-scene-select" style="width:75%" multiple></select>
+                        <div id="link-next-scene-btn" class="btn btn-sm btn-success disabled" data-toggle="modal" data-target="#link-next-scene-modal">Link Next Scene</div>
+                    </div>
                 </div>
                 <hr>
                 <div class="sidebar-row">
@@ -173,6 +188,27 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" id="create-new-scene-btn">Create</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Link Next Scene -->
+    <div class="modal fade" id="link-next-scene-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">Confirm: Link Next Scene</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to link to this scene?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="link-next-scene-confirm-btn">Confirm</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -339,9 +375,11 @@
                         </button>
                         <h4 class="modal-title">Link Next Scene</h4>
                 </div>
-                <div class="modal-body">
-                    <label for="link-next-scene-input">Scene: </label>
-                    <input type="text" id="link-next-scene-input" class="typeahead"/>
+                <div class="modal-body above-scene">
+                    <select class="link-next-scene-select">
+                        <option value="aaron">Aaron</option>
+                        <option value="brandon">Brandon</option>
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" data-dismiss="modal" id="delete-scene-btn-action">Link</button>
