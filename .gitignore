@@ -6,3 +6,4 @@ media
 static/editor/js/bb.js
 static/editor/js/scene.js
 static/editor/js/prop.js
+*.py~
