@@ -151,6 +151,17 @@ def delete_scene(scene):
 		scene = scene_prop.scene
 		scene_prop.delete()
 		scene.save()
+	# Delete the scene thumbnail
+	if not settings.USE_AWS and scene.thumbnail.path:
+		# Delete from MEDIA_ROOT
+		os.remove(scene.thumbnail.path)
+	elif settings.USE_AWS and prop.image.name:
+		# Delete from AWS S3
+		connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+		bucket = Bucket(connection, settings.AWS_STORAGE_BUCKET_NAME)
+		fileKey = Key(bucket)
+		fileKey.key = scene.thumbnail.name
+		bucket.delete_key(fileKey)
 	# Delete the scene itself
 	scene.delete()
 
