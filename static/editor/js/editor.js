@@ -1,3 +1,8 @@
+/**
+* Jajan - SceneMaker
+* editor.js - SceneMaker UI
+**/
+
 $(document).ready(function(){
 
 	// TODO - changeSceneThumbnail
