@@ -2,6 +2,7 @@ venv
 *.pyc
 staticfiles
 db.sqlite3
+mydatabase
 media
 static/editor/js/bb.js
 static/editor/js/scene.js

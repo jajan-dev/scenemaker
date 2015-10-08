@@ -79,6 +79,7 @@ TEMPLATE_DIRS = (
 )
 
 if os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/course/urop/jajan':
+    PRODUCTION = True
     USE_AWS = True
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
     AWS_ACCESS_KEY_ID = 'AKIAIEV4LDWLMWWHLDMA'
@@ -95,7 +96,9 @@ if os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/cou
             'HOST': 'sql.mit.edu'
         }
     }
+    SCENEMAKER_URL = "/scenemaker/"
 else:
+    PRODUCTION = False
     # Database
     # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
     DATABASES = {
@@ -109,7 +112,7 @@ else:
     USE_AWS = False
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
-    
+    SCENEMAKER_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
