@@ -561,7 +561,6 @@ $(document).ready(function(){
 			url : "/scenemaker/api/scenes/" + scene.id,
 			data : JSON.stringify(data),
 			success : function(result){
-				console.log(result);
 				linkSceneModel(id);
 			},
 			error : function(error){
@@ -1099,7 +1098,6 @@ $(document).ready(function(){
 				"always_visible" : $("#edit-prop-always-visible").is(":checked"),
 			}
 		}
-		console.log(data);
 		updateSceneProp(data);
 	});
 
@@ -1197,7 +1195,6 @@ $(document).ready(function(){
 		url: "/scenemaker/api/scenes",
 		success: function(result){
 			var scenes = result.scenes;
-			console.log(scenes.length);
 			for (var i in scenes){
 				var load_scene = scenes[i];
 				var props_array = load_scene.props;
