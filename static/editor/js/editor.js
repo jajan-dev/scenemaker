@@ -1,5 +1,7 @@
 /**
 * Jajan - SceneMaker
+* MIT Fluid Interfaces Lab
+* Aaron Nojima
 * editor.js - SceneMaker UI
 **/
 
