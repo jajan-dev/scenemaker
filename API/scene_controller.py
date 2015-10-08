@@ -109,6 +109,10 @@ def update_scene(scene, data):
 	elif update["type"] == "SCENE":
 		if update.has_key("thumbnail"):
 			decoded_image = update["thumbnail"].decode('base64')
+			if not settings.USE_AWS and scene.thumbnail.path:
+				# In Development, if a thumbnail already exists
+				# Delete from MEDIA_ROOT
+				os.remove(scene.thumbnail.path)
 			scene.thumbnail = ContentFile(decoded_image, "thumbnail.png")
 	elif update["type"] == "BACKGROUND":
 		# Background Scale
