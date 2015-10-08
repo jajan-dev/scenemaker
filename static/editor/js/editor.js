@@ -338,7 +338,6 @@ $(document).ready(function(){
 			$(thumb).addClass("img-thumbnail").addClass("scene-thumbnail");
 			var thumbElement = $("<span></span>").addClass("scene-thumbnail-element").append(thumb).data("scene", scene);
 			$(thumb).data("scene", scene);
-			console.log("append");
 			$("#scene-collection").append(thumbElement);
 
 			// Event Listener for Background Thumbnail - Selection / Set
@@ -1213,7 +1212,6 @@ $(document).ready(function(){
 					var prop = props_array[j];
 					load_scene.props[prop.scene_prop_id] = prop;
 				}
-				scenes[load_scene.id] = load_scene;
 				loadSceneThumbnail(load_scene);
 				var option = $("<option></option>")
 					.text(load_scene.name + " (ID " + load_scene.id + ")")
