@@ -62,8 +62,12 @@ class Background(models.Model):
 		url = "backgrounds/%s/%s" % (self.id, filename)
 		return url
 
+	def thumbnail_key(self, filename):
+		url = "background-thumbnails/%s/%s" % (self.id, "thumbnail.png")
+
 	## Image Data
 	image = models.ImageField(upload_to=key)
+	thumbnail = models.ImageField(upload_to=thumbnail_key, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.name
