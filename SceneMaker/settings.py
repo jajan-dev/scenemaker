@@ -57,19 +57,6 @@ ROOT_URLCONF = 'SceneMaker.urls'
 
 WSGI_APPLICATION = 'SceneMaker.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jajan+scenemaker',
-        'USER': 'jajan',
-        'PASSWORD': 'jajandevpw',
-        'HOST': 'sql.mit.edu'
-    }
-}
-
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -99,10 +86,30 @@ if os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/cou
     AWS_STORAGE_BUCKET_NAME = 'jajan-scenemaker-assets'
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = True
+    DATABASES = {
+        'default' : {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'jajan+scenemaker',
+            'USER': 'jajan',
+            'PASSWORD': 'jajandevpw',
+            'HOST': 'sql.mit.edu'
+        }
+    }
 else:
+    # Database
+    # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'mydatabase',
+        }
+    }
+
+    # Media
     USE_AWS = False
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/media/'
+    
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
