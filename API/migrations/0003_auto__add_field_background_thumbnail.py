@@ -3,7 +3,7 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-
+from django.conf import settings
 
 class Migration(SchemaMigration):
 
@@ -12,6 +12,7 @@ class Migration(SchemaMigration):
         db.add_column(u'API_background', 'thumbnail',
                       self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True),
                       keep_default=False)
+        print settings.DATABASES
 
 
     def backwards(self, orm):
