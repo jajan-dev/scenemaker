@@ -3,16 +3,15 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-from django.conf import settings
+
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'Background.thumbnail'
         db.add_column(u'API_background', 'thumbnail',
-                      self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True),
+                      self.gf('django.db.models.fields.files.ImageField')(default='background-thumbnails/default/thumbnail.png', max_length=100),
                       keep_default=False)
-        print settings.DATABASES
 
 
     def backwards(self, orm):
@@ -28,7 +27,7 @@ class Migration(SchemaMigration):
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'keyword': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'thumbnail': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
+            'thumbnail': ('django.db.models.fields.files.ImageField', [], {'default': "'background-thumbnails/default/thumbnail.png'", 'max_length': '100'})
         },
         u'API.prop': {
             'Meta': {'object_name': 'Prop'},

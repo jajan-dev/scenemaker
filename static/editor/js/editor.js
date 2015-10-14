@@ -48,7 +48,7 @@ $(document).ready(function(){
 		// Create a Thumbnail
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
-		thumb.src = background.url || window.SCENEMAKER_URL + "/media/default/question-mark.jpg";
+		thumb.src = background.thumbnail || window.SCENEMAKER_URL + "/media/default/question-mark.jpg"; // TODO
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection

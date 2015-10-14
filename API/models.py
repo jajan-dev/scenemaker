@@ -1,5 +1,8 @@
 from django import forms
 from django.db import models
+from PIL import Image, ImageDraw
+from StringIO import StringIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 class Scene(models.Model):
 	
@@ -66,9 +69,39 @@ class Background(models.Model):
 		url = "background-thumbnails/%s/%s" % (self.id, "thumbnail.png")
 		return url
 
+	def set_thumbnail(self, image):
+		self.thumbnail = image
+		size = (128, 72)
+		self.thumbnail.file.seek(0)
+		img = Image.open(StringIO(self.thumbnail.file.read()))
+		img.thumbnail(size, Image.ANTIALIAS)
+		new_width = img.width
+		new_height = img.height
+		format = img.format
+		img = img.crop((0, 0, 128, 72))
+		draw = ImageDraw.Draw(img)
+		if new_width < 128:
+			# Fill remaining horizontal section with white
+			draw.rectangle((new_width, 0, 128, 72), fill='white')
+		if new_height < 72:
+			# Fill remaining vertical section with white
+			draw.rectangle((0, new_height, 128, 72), fill='white')
+		del draw
+		imageString = StringIO()
+		img.save(imageString, format)
+
+		c_type = self.thumbnail.file.content_type.replace('images', 'image')
+		imf = InMemoryUploadedFile(imageString, None, self.thumbnail.name, c_type, imageString.len, None)
+		imf.seek(0)
+		self.thumbnail.save(
+				self.thumbnail.name,
+				imf,
+				save=False
+			)
+
 	## Image Data
 	image = models.ImageField(upload_to=key)
-	thumbnail = models.ImageField(upload_to=thumbnail_key, blank=True, null=True)
+	thumbnail = models.ImageField(upload_to=thumbnail_key, default="background-thumbnails/default/thumbnail.png")
 
 	def __unicode__(self):
 		return self.name
@@ -92,7 +125,6 @@ class Prop(models.Model):
 
 	## Image Data
 	image = models.ImageField(upload_to=key)
-	thumbnail = models.ImageField(upload_to=thumbnail_key, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.name

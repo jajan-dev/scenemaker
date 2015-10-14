@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage as storage
 from django.core.files.base import ContentFile
 from boto.s3.connection import S3Connection, Bucket, Key
+from PIL import Image
 import json, os, time
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,12 +14,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from API.models import *
 
 def asset_response(model):
-	return {
+	response = {
 		"id" : model.id,
 		"name" : model.name,
 		"description" : model.description,
-		"url" : model.image.url
+		"url" : model.image.url,
 	}
+	response["thumbnail"] = model.thumbnail.url
+	return response
 
 @csrf_exempt
 def add_scene_background(request, scene_id):
@@ -63,6 +66,8 @@ def backgrounds(request):
 		background_model = Background(name=request.POST.get("name"), description=request.POST.get("description"))
 		background_model.save()
 		background_model.image = request.FILES["background"]
+		background_model.set_thumbnail(request.FILES["background"])
+
 		background_model.save()
 		response_data = {
 			"background" : asset_response(background_model),
