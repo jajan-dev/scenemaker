@@ -90,8 +90,8 @@ class Background(models.Model):
 		imageString = StringIO()
 		img.save(imageString, format)
 
-		c_type = self.thumbnail.file.content_type.replace('images', 'image')
-		imf = InMemoryUploadedFile(imageString, None, self.thumbnail.name, c_type, imageString.len, None)
+		# c_type = self.thumbnail.file.content_type.replace('images', 'image')
+		imf = InMemoryUploadedFile(imageString, None, self.thumbnail.name, format, imageString.len, None)
 		imf.seek(0)
 		self.thumbnail.save(
 				self.thumbnail.name,
