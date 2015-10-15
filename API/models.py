@@ -75,9 +75,8 @@ class Background(models.Model):
 		self.thumbnail.file.seek(0)
 		img = Image.open(StringIO(self.thumbnail.file.read()))
 		img.thumbnail(size, Image.ANTIALIAS)
-		new_width = img.width
-		new_height = img.height
-		format = img.format
+		new_width = img.size[0]
+		new_height = img.size[0]
 		img = img.crop((0, 0, 128, 72))
 		draw = ImageDraw.Draw(img)
 		if new_width < 128:
@@ -88,10 +87,8 @@ class Background(models.Model):
 			draw.rectangle((0, new_height, 128, 72), fill='white')
 		del draw
 		imageString = StringIO()
-		img.save(imageString, format)
-
-		# c_type = self.thumbnail.file.content_type.replace('images', 'image')
-		imf = InMemoryUploadedFile(imageString, None, self.thumbnail.name, format, imageString.len, None)
+		img.save(imageString, "PNG")
+		imf = InMemoryUploadedFile(imageString, None, self.thumbnail.name, "PNG", imageString.len, None)
 		imf.seek(0)
 		self.thumbnail.save(
 				self.thumbnail.name,
