@@ -48,7 +48,7 @@ $(document).ready(function(){
 		// Create a Thumbnail
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
-		thumb.src = background.thumbnail || window.SCENEMAKER_URL + "/media/default/question-mark.jpg"; // TODO
+		thumb.src = background.thumbnail || window.SCENEMAKER_URL + "/media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("background-thumbnail").data("background", background);
 
 		// Create a New Row in the Background Collection
@@ -112,6 +112,7 @@ $(document).ready(function(){
 			scene.background.originalHeight = tempBackground.height;
 			var width = scene.background_scale * scene.background.originalWidth * adjustedScale;
 			var height = scene.background_scale * scene.background.originalHeight * adjustedScale;
+			console.log(width, height);
 			$("#scene-background-image").width(width).height(height);
 		}
 		tempBackground.src = background.url || "";
@@ -146,7 +147,7 @@ $(document).ready(function(){
 
 		var thumb = new Image();
 		thumb.crossOrigin = "Anonymous";
-		thumb.src = prop.url || window.SCENEMAKER_URL + "media/default/question-mark.jpg";
+		thumb.src = prop.thumbnail || window.SCENEMAKER_URL + "media/default/question-mark.jpg";
 		$(thumb).addClass("img-thumbnail").addClass("prop-thumbnail").data("prop", prop);
 		var thumbContainer = $("<span></span>").append(thumb).data("prop", prop);
 		$("#props-collection").append(thumbContainer);

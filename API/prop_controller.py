@@ -13,12 +13,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from API.models import *
 
 def asset_response(model):
-	return {
+	response = {
 		"id" : model.id,
 		"name" : model.name,
 		"description" : model.description,
 		"url" : model.image.url
 	}
+	response["thumbnail"] = model.thumbnail.url
+	return response
 
 @csrf_exempt
 def add_scene_prop(request, scene_id):
