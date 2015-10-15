@@ -507,7 +507,7 @@ $(document).ready(function(){
 		
 		// Change Background
 		$("#editor-background .background-thumbnail")
-			.attr("src", (scene.background && scene.background.url) || "/static/editor/img/blank-background.jpg")
+			.attr("src", (scene.background && scene.background.thumbnail) || "/static/editor/img/blank-background.jpg")
 			.attr("data-toggle", "modal")
 			.attr("data-target", "#background-modal")
 			.click(function(event){
@@ -524,7 +524,7 @@ $(document).ready(function(){
 			}
 			var propImage = new Image();
 			propImage.crossOrigin = "Anonymous";
-			propImage.src = prop.url;
+			propImage.src = prop.thumbnail;
 			$(propImage).addClass("img-thumbnail")
 				.addClass("prop-thumbnail")
 				.attr("data-toggle", "modal")

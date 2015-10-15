@@ -23,7 +23,8 @@ def scene_response(scene):
 			"id" : "",
 			"name" : "",
 			"description" : "",
-			"url" : "/static/editor/img/blank-background.jpg"
+			"url" : "/static/editor/img/blank-background.jpg",
+			"thumbnail" : ""
 		},
 		"background_scale" : float(scene.background_scale),
 		"props" : []
@@ -41,7 +42,8 @@ def scene_response(scene):
 			"id" : background.id,
 			"name" : background.name,
 			"description" : background.description,
-			"url" : background.image.url
+			"url" : background.image.url,
+			"thumbnail" : background.thumbnail.url
 		}
 	# Get all the props in the scene
 	for scene_prop in SceneProp.objects.filter(scene=scene):
@@ -53,6 +55,7 @@ def scene_response(scene):
 				"name" : prop.name,
 				"description" : prop.description,
 				"url" : prop.image.url,
+				"thumbnail" : prop.thumbnail.url,
 				"position_x" : scene_prop.position_x,
 				"position_y" : scene_prop.position_y,
 				"movable" : scene_prop.movable,
@@ -156,10 +159,10 @@ def delete_scene(scene):
 		scene_prop.delete()
 		scene.save()
 	# Delete the scene thumbnail
-	if not settings.USE_AWS and scene.thumbnail.path:
+	if not settings.USE_AWS and hasattr(scene.thumbnail, 'path'):
 		# Delete from MEDIA_ROOT
 		os.remove(scene.thumbnail.path)
-	elif settings.USE_AWS and prop.image.name:
+	elif settings.USE_AWS and hasattr(scene.thumbnail, 'name'):
 		# Delete from AWS S3
 		connection = S3Connection(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
 		bucket = Bucket(connection, settings.AWS_STORAGE_BUCKET_NAME)
