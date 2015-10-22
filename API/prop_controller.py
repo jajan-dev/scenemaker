@@ -42,7 +42,6 @@ def add_scene_prop(request, scene_id):
 						"scene_prop_id" : new_sceneprop.id,
 						"name" : prop.name,
 						"description" : prop.description,
-						"url" : prop.image.url,
 						"scale" : new_sceneprop.scale,
 						"position_x" : new_sceneprop.position_x,
 						"position_y" : new_sceneprop.position_y,
@@ -50,6 +49,10 @@ def add_scene_prop(request, scene_id):
 						"rotation" : new_sceneprop.rotation
 					}
 				}
+				if prop.image is not None:
+					response_data["prop"]["url"] = prop.image.url
+				if prop.thumbnail is not None:
+					response_data["prop"]["thumbnail"] = prop.thumbnail.url
 				return HttpResponse(json.dumps(response_data), content_type="application/json")
 			except ObjectDoesNotExist:
 				return HttpResponse(status=404)
