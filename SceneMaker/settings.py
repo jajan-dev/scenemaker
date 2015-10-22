@@ -78,7 +78,7 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
 )
 
-if (os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/course/urop/jajan') or os.environ.has_key('ATHENA_SYS'):
+if (os.environ.has_key('HOME') and os.environ['HOME'] == '/afs/athena.mit.edu/course/urop/jajan'):
     PRODUCTION = True
     USE_AWS = True
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'

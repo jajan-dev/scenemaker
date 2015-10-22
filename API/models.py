@@ -100,7 +100,7 @@ class Background(models.Model):
 		image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
 
 		new_width = image.size[0]
-		new_height = image.size[0]
+		new_height = image.size[1]
 		image = image.crop((0, 0, 128, 72))
 		draw = ImageDraw.Draw(image)
 		if new_width < 128:
@@ -119,10 +119,41 @@ class Background(models.Model):
 		# Save image to a SimpleUploadedFile which can be saved into
 		# ImageField
 		suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
-				temp_handle.read(), content_type="image/png")
+				temp_handle.read(), content_type=DJANGO_TYPE)
 		# Save SimpleUploadedFile into image field
 		self.thumbnail.save(
 			'%s_thumbnail.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+			suf,
+			save=False
+		)
+
+	def constrain_image_size(self):
+		if not self.image:
+			return
+
+		IMAGE_SIZE = (1920, 1080)
+		DJANGO_TYPE = "image/png"
+		PIL_TYPE = "png"
+		FILE_EXTENSION = "png"
+
+		image = Image.open(StringIO(self.image.read()))
+
+		image.thumbnail(IMAGE_SIZE, Image.ANTIALIAS)
+		print 'changed size', IMAGE_SIZE
+
+		new_width = image.size[0]
+		new_height = image.size[1]
+		print new_width, new_height
+
+		temp_handle = StringIO()
+		image.save(temp_handle, PIL_TYPE)
+		temp_handle.seek(0)
+
+		suf = SimpleUploadedFile(os.path.split(self.image.name)[-1],
+				temp_handle.read(), content_type=DJANGO_TYPE)
+
+		self.image.save(
+			"%s.%s" % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
 			suf,
 			save=False
 		)
@@ -177,7 +208,7 @@ class Prop(models.Model):
 		image.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
 
 		new_width = image.size[0]
-		new_height = image.size[0]
+		new_height = image.size[1]
 		image = image.crop((0, 0, 72, 72))
 		draw = ImageDraw.Draw(image)
 		if new_width < 72:

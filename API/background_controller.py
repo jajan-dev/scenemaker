@@ -17,10 +17,12 @@ def asset_response(model):
 	response = {
 		"id" : model.id,
 		"name" : model.name,
-		"description" : model.description,
-		"url" : model.image.url,
+		"description" : model.description
 	}
-	response["thumbnail"] = model.thumbnail.url
+	if model.image is not None:
+		response["url"] = model.image.url
+	if model.thumbnail is not None:
+		response["thumbnail"] = model.thumbnail.url
 	return response
 
 @csrf_exempt
@@ -66,7 +68,8 @@ def backgrounds(request):
 		background_model = Background(name=request.POST.get("name"), description=request.POST.get("description"))
 		background_model.save()
 		background_model.image = request.FILES["background"]
-		background_model.set_thumbnail(request.FILES["background"])
+		background_model.constrain_image_size()
+		background_model.generate_thumbnail()
 
 		background_model.save()
 		response_data = {
